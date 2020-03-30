@@ -5,10 +5,6 @@ package com.yliu.algorithm.list;
  */
 public class QueueAndAlgorithm {
     /**
-     * FIFO先进先出
-     */
-
-    /**
      * LRU
      */
 
