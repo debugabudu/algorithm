@@ -2,9 +2,9 @@ package com.yliu.algorithm.questions;
 
 import java.util.*;
 
-public class RealQuestion {
+public class RealQuestion1 {
     /**
-     * 性代数-混合颜料
+     * 1.线性代数-混合颜料
      * 你现在想绘制一幅画，但是你现在没有足够颜色的颜料。为了让问题简单，我们用正整数表示不同颜色的颜料。
      * 你知道这幅画需要的n种颜色的颜料，你现在可以去商店购买一些颜料，但是商店不能保证能供应所有颜色的颜料，所以你需要自己混合一些颜料。
      * 混合两种不一样的颜色A和颜色B颜料可以产生(A XOR B)这种颜色的颜料(新产生的颜料也可以用作继续混合产生新的颜色,XOR表示异或操作)。
@@ -22,7 +22,7 @@ public class RealQuestion {
             int count = 0;
             for(int i=n-1; i>=0; i--){
                 for(int j=i-1; j>=0; j--){
-                    if(highbit(col[i]) == highbit(col[j])){
+                    if(highBit(col[i]) == highBit(col[j])){
                         col[j] = col[j] ^ col[i];
                     }
                 }
@@ -35,7 +35,7 @@ public class RealQuestion {
             System.out.println(count);
         }
     }
-    public static int highbit(int x){
+    private static int highBit(int x){
         for(int i=31; i>=0; i--){
             int m = (x>>i)&1;
             if(m != 0)
@@ -45,18 +45,18 @@ public class RealQuestion {
     }
 
     /**
-     * 正则表达式匹配
+     * 2.正则表达式匹配
      * 请实现一个函数用来匹配包括'.'和星号的正则表达式。模式中的字符'.'表示任意一个字符，而星号表示它前面的字符可以出现任意次（包含0次）。
      * 在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但是与"aa.a"和"ab*a"均不匹配。
      * 解题思路
      * 当模式中的第二个字符不是“*”时：
-     * 1、如果字符串第一个字符和模式中的第一个字符相匹配，那么字符串和模式都后移一个字符，然后匹配剩余的。
-     * 2、如果 字符串第一个字符和模式中的第一个字符相不匹配，直接返回false。
+     * ①如果字符串第一个字符和模式中的第一个字符相匹配，那么字符串和模式都后移一个字符，然后匹配剩余的。
+     * ②如果 字符串第一个字符和模式中的第一个字符相不匹配，直接返回false。
      * 而当模式中的第二个字符是“*”时：
      * 如果字符串第一个字符跟模式第一个字符不匹配，则模式后移2个字符，继续匹配。如果字符串第一个字符跟模式第一个字符匹配，可以有3种匹配方式：
-     * 1、模式后移2字符，相当于x*被忽略；
-     * 2、字符串后移1字符，模式后移2字符；
-     * 3、字符串后移1字符，模式不变，即继续匹配字符下一位，因为*可以匹配多位
+     * ①模式后移2字符，相当于x*被忽略；
+     * ②字符串后移1字符，模式后移2字符；
+     * ③字符串后移1字符，模式不变，即继续匹配字符下一位，因为*可以匹配多位
      */
     public boolean match(char[] str, char[] pattern) {
         if (str == null || pattern == null) {
@@ -66,7 +66,7 @@ public class RealQuestion {
         int patternIndex = 0;
         return matchCore(str, strIndex, pattern, patternIndex);
     }
-    public boolean matchCore(char[] str, int strIndex, char[] pattern, int patternIndex) {
+    private boolean matchCore(char[] str, int strIndex, char[] pattern, int patternIndex) {
         //有效性检验：str到尾，pattern到尾，匹配成功
         if (strIndex == str.length && patternIndex == pattern.length) {
             return true;
@@ -93,7 +93,7 @@ public class RealQuestion {
     }
 
     /**
-     * 数组中的逆序对
+     * 3.数组中的逆序对
      * 在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组,求出这个数组中的逆序对的总数P。并将P对1000000007取模的结果输出。 即输出P%1000000007。
      * 思路：先把数组分割成子数组，先统计出子数组内部的逆序对的数目，然后再统计出两个相邻子数组之间的逆序对的数目。在统计逆序对的过程中，还需要对数组进行排序。
      * 归并排序的改进，把数据分成前后两个数组(递归分到每个数组仅有一个数据项)，
@@ -105,11 +105,8 @@ public class RealQuestion {
             return 0;
         }
         int[] copy = new int[array.length];
-        for(int i=0;i<array.length;i++){
-            copy[i] = array[i];
-        }
-        int count = InversePairsCore(array,copy,0,array.length-1);//数值过大求余
-        return count;
+        System.arraycopy(array, 0, copy, 0, array.length);
+        return InversePairsCore(array,copy,0,array.length-1);
     }
     private  static int InversePairsCore(int[] array,int[] copy,int low,int high){
         if(low==high){
@@ -139,14 +136,12 @@ public class RealQuestion {
         for(;j>mid;j--){
             copy[locCopy--]=array[j];
         }
-        for(int s=low;s<=high;s++){
-            array[s] = copy[s];
-        }
+        if (high + 1 - low >= 0) System.arraycopy(copy, low, array, low, high + 1 - low);
         return (leftCount+rightCount+count)%1000000007;
     }
 
     /**
-     * 字符串排序
+     * 4.字符串排序
      * 输入一个字符串,按字典序打印出该字符串中字符的所有排列。例如输入字符串abc,则打印出由字符a,b,c所能排列出来的所有字符串abc,acb,bac,bca,cab和cba。
      */
     //回溯法
@@ -158,7 +153,7 @@ public class RealQuestion {
         }
         return res;
     }
-    public void PermutationHelper(char[] cs, int i, ArrayList<String> list) {
+    private void PermutationHelper(char[] cs, int i, ArrayList<String> list) {
         if(i == cs.length - 1) {
             String val = String.valueOf(cs);
             if (!list.contains(val))
@@ -171,7 +166,7 @@ public class RealQuestion {
             }
         }
     }
-    public void swap(char[] x, int a, int b) {
+    private void swap(char[] x, int a, int b) {
         char t = x[a];
         x[a] = x[b];
         x[b] = t;
@@ -206,7 +201,7 @@ public class RealQuestion {
 
         return res;
     }
-    public void reverse(char[] seq, int start) {
+    private void reverse(char[] seq, int start) {
         int len;
         if(seq == null || (len = seq.length) <= start)
             return;
@@ -218,75 +213,7 @@ public class RealQuestion {
     }
 
     /**
-     * 栈的压入弹出序列
-     * 输入两个整数序列，第一个序列表示栈的压入顺序，请判断第二个序列是否为该栈的弹出顺序。假设压入栈的所有数字均不相等。
-     * 例如序列1,2,3,4,5是某栈的压入顺序，序列4，5,3,2,1是该压栈序列对应的一个弹出序列，但4,3,5,1,2就不可能是该压栈序列的弹出序列。
-     */
-    public boolean IsPopOrder(int [] pushA,int [] popA) {
-        if(pushA.length != popA.length || pushA == null || popA == null || pushA.length == 0 || popA.length == 0){
-            return false;
-        }
-        Stack<Integer> s = new Stack<>();
-        int i = 0;
-        int j = 0;
-        s.push(pushA[i++]);
-        while(j <= popA.length-1){
-            while(popA[j] != s.peek()){
-                if(i == pushA.length) return false;
-                s.push(pushA[i++]);
-            }
-            j++;
-            s.pop();
-        }
-        return true;
-    }
-
-    /**
-     * 跳石板
-     * 小易来到了一条石板路前，每块石板上从1挨着编号为：1、2、3.......这条石板路要根据特殊的规则才能前进：对于小易当前所在的编号为K的 石板，小易单次只能往前跳K的一个约数(不含1和K)步，
-     * 即跳到K+X(X为K的一个非1和本身的约数)的位置。 小易当前处在编号为N的石板，他想跳到编号恰好为M的石板去，小易想知道最少需要跳跃几次可以到达。
-     * 思路 从m 到n 至少需要多少步
-     * mark[i]记录到达位置i的最少步数。初始化mark[],起始位置mark[m]为0外，其它位置都为无穷大
-     * I~[m,n-2]依次更新mark[]:
-     * 判断，如果mark[i]为无穷大，则说明该位置不可由m到达，那么该位置也就到不了n。跳过，不作处理。减枝。
-     * 如果mark[i]不是无穷大，计算i的因子，对每一个因子求出i的下一步的位置tmp，如果mark[tmp]>mark[i]+1，更新mark[tmp]=mark[i]+1;
-     * 最终结果是mark[n],如果mark[n]是无穷大，则输出-1；否则返回mark[n]。
-     * 比如以8开始 mark[8]=0,8的因子list={2,4},
-     * factor=2,可到达10,mark[10]原本是无穷大,现在更新mark[10]=mark[8]+1;12同理。
-     * 循环下一个i=9，mark[9]是无穷大，跳过，不用处理。
-     * 也就是由8产生10和12，接下来就处理10,12及其产生的位置，而无需处理其他。
-     */
-    public static int deal(int m,int n){//m到n
-        int mark[]=new int[n+1];//记录到达每一个位置的步数
-        for(int i=m+1;i<=n;i++){   //初始化
-            mark[i]=Integer.MAX_VALUE;
-        }
-        for(int i=m;i<n-1;i++){   //填mark[]
-            if(mark[i]==Integer.MAX_VALUE)continue;//如果当前起始位置本身不可达 不作处理
-            ArrayList<Integer> list=allFactor(i);//获得当前位置i的所有因子
-            for(int j=0;j<list.size();j++){//计算i能到达的每一个位置tmp
-                int tmp=i+list.get(j);
-                int count=mark[i]+1;
-                if(tmp<=n&&mark[tmp]>count){//如果从I到达位置tmp的次数比以前记录的小 更新mark[tmp]
-                    mark[tmp]=count;
-                }
-            }
-        }
-        return mark[n];
-    }
-    public static ArrayList<Integer>  allFactor(int n){//获得n的所有因子 除1 n外
-        ArrayList<Integer> list=new ArrayList<>();
-        for(int i=2;i<=Math.sqrt(n);i++){
-            if(n%i==0){
-                list.add(i);
-                if(i!=n/i)list.add(n/i);
-            }
-        }
-        return list;
-    }
-
-    /**
-     * BFS-推箱子
+     * 5.BFS-推箱子
      * 在一个N*M的地图上，有1个玩家、1个箱子、1个目的地以及若干障碍，其余是空地。玩家可以往上下左右4个方向移动，但是不能移动出地图或者移动到障碍里去。
      * 如果往这个方向移动推到了箱子，箱子也会按这个方向移动一格，当然，箱子也不能被推出地图或推到障碍里。当箱子被推到目的地以后，游戏目标达成。
      * 现在告诉你游戏开始是初始的地图布局，请你求出玩家最少需要移动多少步才能够将游戏目标达成。
@@ -299,8 +226,7 @@ public class RealQuestion {
     private static class State {
         int px, py, bx, by;
         State pre;
-
-        public State(int px, int py, int bx, int by, State pre) {
+        State(int px, int py, int bx, int by, State pre) {
             this.px = px;
             this.py = py;
             this.bx = bx;
@@ -308,8 +234,7 @@ public class RealQuestion {
             this.pre = pre;
         }
     }
-
-    public static void main(String[] args) {
+    public void pushBox() {
         Scanner sc = new Scanner(System.in);
         while (sc.hasNext()) {
             String s = sc.nextLine();
@@ -334,7 +259,6 @@ public class RealQuestion {
         }
 
     }
-
     private static List<State> bfs(char[][] maze, State start) {
         int n = maze.length;
         int m = maze[0].length;

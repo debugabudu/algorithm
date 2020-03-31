@@ -24,7 +24,7 @@ public class Sort {
         quickSort(a,left,k-1);
         quickSort(a,k+1,right);
     }
-    public static int sortOneTime(int[] a, int left, int right){
+    private static int sortOneTime(int[] a, int left, int right){
         int key = a[left];
         while (left < right){
             while (a[right]>=key && left<right){
@@ -58,12 +58,12 @@ public class Sort {
             adjustHeap(a, 0, i - 1);
         }
     }
-    public static void adjustHeap(int[] a, int i, int len){
+    private static void adjustHeap(int[] a, int i, int len){
         int temp, j;
         temp = a[i];
         // 沿关键字较大的孩子结点向下筛选
         for (j = 2 * i; j < len; j *= 2) {
-            if (j < len && a[j] < a[j + 1]){
+            if (a[j] < a[j + 1]){
                 ++j; // j为关键字中较大记录的下标
             }
             if (temp >= a[j]){
@@ -135,7 +135,7 @@ public class Sort {
     public static void mergeSort(int[] a){
         sort(a, 0, a.length-1);
     }
-    public static void sort(int[] a, int left, int right){
+    private static void sort(int[] a, int left, int right){
         if (left >= right){
             return;
         }
@@ -144,7 +144,7 @@ public class Sort {
         sort(a, mid+1, right);
         merge(a, left, mid, right);
     }
-    public static void merge(int[] a, int left, int mid, int right){
+    private static void merge(int[] a, int left, int mid, int right){
         int n = right - left + 1;
         int[] tmp = new int[n];
         int l = left;
@@ -163,9 +163,7 @@ public class Sort {
         while (r <= right){
             tmp[t++] = a[r++];
         }
-        for (int i=0; i<t; i++){
-            a[left+i] = tmp[i];
-        }
+        if (t >= 0) System.arraycopy(tmp, 0, a, left, t);
     }
 
     /**
@@ -175,10 +173,9 @@ public class Sort {
     public static void sort(int[] a){
         for (int n=1; n<a.length; n = n*2){
             for (int i=0; i<a.length-n; i=i+2*n){
-                int left = i;
                 int mid = i+n-1;
                 int right = Math.min(i+2*n-1,a.length-1);
-                merge(a,left,mid,right);
+                merge(a, i,mid,right);
             }
         }
     }

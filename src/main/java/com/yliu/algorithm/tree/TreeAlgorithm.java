@@ -80,7 +80,7 @@ public class TreeAlgorithm {
         return helper(0, 0, inorder.length - 1, preorder, inorder);
     }
 
-    public TreeNode helper(int preStart, int inStart, int inEnd, int[] preorder, int[] inorder) {
+    private TreeNode helper(int preStart, int inStart, int inEnd, int[] preorder, int[] inorder) {
         if (preStart > preorder.length - 1 || inStart > inEnd) {
             return null;
         }
@@ -102,7 +102,7 @@ public class TreeAlgorithm {
     public TreeNode buildTree1(int[] inorder, int[] postorder) {
         return  dfs(postorder.length-1,0,inorder.length-1,inorder,postorder);
     }
-    public TreeNode dfs(int endpost,int instart,int inend,int [] inorder,int [] postorder){
+    private TreeNode dfs(int endpost, int instart, int inend, int[] inorder, int[] postorder){
         if(inorder.length-1<endpost||inend<instart||endpost<0) return null;
         TreeNode root=new TreeNode(postorder[endpost]);
         int index=0;
