@@ -142,10 +142,10 @@ public class TreeAlgorithm {
                 }
                 leftToRight = !leftToRight;
                 while (iter.hasNext()) {
-                    TreeNode temp = (TreeNode)iter.next();
+                    TreeNode temp = iter.next();
                     list.add(temp.value);
                 }
-                ret.add(new ArrayList<Integer>(list));
+                ret.add(new ArrayList<>(list));
                 list.clear();
                 queue.addLast(null);//添加层分隔符
                 continue;//一定要continue
