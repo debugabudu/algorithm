@@ -8,7 +8,13 @@ import java.util.Queue;
 /**
  * 二叉树的遍历和重建
  */
-public class TreeAlgorithm {
+public class BinaryTree {
+    class TreeNode {
+        int value;
+        TreeNode left;
+        TreeNode right;
+        TreeNode(int x) { value = x; }
+    }
     /**
      * 层序（队列实现）
      * 根节点入队，队列不为空，当前节点出队并打印，左右节点入队
