@@ -45,11 +45,12 @@ public class Sort {
      */
     public static void heapSort(int[] a){
         int i;
-        // 构建一个大顶堆
+        //1.构建一个大顶堆
         for (i = a.length / 2 - 1; i >= 0; i--) {
+            //从第一个非叶子结点从下至上，从右至左调整结构
             adjustHeap(a, i, a.length - 1);
         }
-        // 将堆顶记录和当前未经排序子序列的最后一个记录交换
+        //2.调整堆结构+交换堆顶元素与末尾元素
         for (i = a.length - 1; i >= 0; i--) {
             int temp = a[0];
             a[0] = a[i];
