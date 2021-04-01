@@ -38,7 +38,7 @@ public class BinaryTree {
 
     /**
      * 前序非递归（堆栈实现）
-     * 当前节点不为空且堆栈不为空，当前节点不为空，节点入栈并打印，左节点入栈；节点为空，出栈并找出栈节点的右节点
+     * 当前节点不为空或堆栈不为空，当前节点不为空，节点入栈并打印，左节点入栈；节点为空，出栈并找出栈节点的右节点
      */
     public static void preRecur2(TreeNode root){
         LinkedList<TreeNode> stack = new LinkedList<>();
@@ -57,7 +57,7 @@ public class BinaryTree {
 
     /**
      * 后序非递归（堆栈实现）
-     * 增加一个辅助输出堆栈；当前节点不为空且堆栈不为空，当前节点不为空，节点入栈与辅助栈，右节点入栈；节点为空，出栈并找出栈节点的左节点，打印辅助堆栈。
+     * 增加一个辅助输出堆栈；当前节点不为空或堆栈不为空，当前节点不为空，节点入栈与辅助栈，右节点入栈；节点为空，出栈并找出栈节点的左节点，打印辅助堆栈。
      */
     public static void bacRecur2(TreeNode root){
         LinkedList<TreeNode> stack = new LinkedList<>();
