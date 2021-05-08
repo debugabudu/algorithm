@@ -1,183 +1,175 @@
 package com.yliu.algorithm.usually;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 /**
  * 排序
  */
 public class Sort {
-    /**
-     * 稳定：冒泡、插入、归并、桶、基数
-     * 不稳定：选择、希尔、堆、快速
-     * 每种的时间复杂度、空间复杂度，不同情况如何选择排序算法
-     */
-
-    /**
-     * 快排
-     */
-    public static void quickSort(int[] a, int left, int right){
-        if (left >= right){
+    //选择排序
+    private static void selectSort(int[] nums){
+        if (nums == null || nums.length<=1){
             return;
         }
-        int k = sortOneTime(a,left,right);
-        quickSort(a,left,k-1);
-        quickSort(a,k+1,right);
+        for (int i=0; i<nums.length-1; i++){
+            int min = i;
+            for (int j=i+1; j<nums.length; j++){
+                if (nums[j] < nums[min]){
+                    min = j;
+                }
+            }
+            if (min != i){
+                int tmp = nums[i];
+                nums[i] = nums[min];
+                nums[min] = tmp;
+            }
+        }
     }
-    private static int sortOneTime(int[] a, int left, int right){
-        int key = a[left];
-        while (left < right){
-            while (a[right]>=key && left<right){
+
+    //冒泡排序
+    private static void bubbleSort(int[] nums){
+        for (int i=0; i<nums.length-1; i++){
+            for (int j=0; j<nums.length-i-1; j++){
+                if (nums[j] > nums[j+1]){
+                    int tmp = nums[j];
+                    nums[j] = nums[j+1];
+                    nums[j+1] = tmp;
+                }
+            }
+        }
+    }
+
+    //插入排序
+    private static void insertSort(int[] nums){
+        for (int i=1; i<nums.length; i++){
+            int tmp = nums[i];
+            int j = i-1;
+            while (j>=0 && nums[j]>tmp){
+                nums[j+1] = nums[j];
+                j--;
+            }
+            nums[j+1] = tmp;
+        }
+    }
+
+    //希尔排序
+    private static void shellSort(int[] nums){
+        for (int gap=nums.length/2; gap>0; gap/=2){
+            for (int i=gap; i<nums.length; i++){
+                int tmp = nums[i];
+                int j = i-gap;
+                while (j>=0 && nums[j]>tmp){
+                    nums[j+gap] = nums[j];
+                    j-=gap;
+                }
+                nums[j+gap] = tmp;
+            }
+        }
+    }
+
+    //归并排序
+    private static void mergeSort(int[] nums){
+        sort(nums,0,nums.length-1);
+    }
+
+    private static void sort(int[] nums, int left, int right){
+        if (right<=left){
+            return;
+        }
+        int mid = (left+right)/2;
+        sort(nums,left,mid);
+        sort(nums,mid+1,right);
+        merge(nums,left,mid,right);
+    }
+
+    private static void merge(int[] nums, int left, int mid, int right){
+        int[] tmp = new int[right-left+1];
+        int l = left;
+        int r = mid+1;
+        int t = 0;
+        while (l<=mid && r<=right){
+            if (nums[l]<nums[r]){
+                tmp[t++] = nums[l++];
+            }else {
+                tmp[t++] = nums[r++];
+            }
+        }
+        while (l<=mid){
+            tmp[t++] = nums[l++];
+        }
+        while (r<=right){
+            tmp[t++] = nums[r++];
+        }
+        if (t>=0)System.arraycopy(tmp,0,nums,left,t);
+    }
+
+    //快速排序
+    private static void quickSort(int[] nums){
+        quick(nums,0,nums.length-1);
+    }
+
+    private static void quick(int[] nums, int left, int right){
+        if (right<=left){
+            return;
+        }
+        int index = sortOneTime(nums,left,right);
+        quick(nums,left,index-1);
+        quick(nums,index+1,right);
+    }
+
+    private static int sortOneTime(int[] nums, int left, int right){
+        int key = nums[left];
+        while (left<right){
+            while (nums[right]>key && right>left){
                 right--;
             }
-            a[left] = a[right];
-            while (a[left]<=key && left<right){
+            nums[left] = nums[right];
+            while (nums[left]<key && left<right){
                 left++;
             }
-            a[right] = a[left];
+            nums[right] = nums[left];
         }
-        a[left] = key;
+        nums[left] = key;
         return left;
     }
 
-    /**
-     * 堆排
-     */
-    public static void heapSort(int[] a){
-        int i;
-        //1.构建一个大顶堆
-        for (i = a.length / 2 - 1; i >= 0; i--) {
-            //从第一个非叶子结点从下至上，从右至左调整结构
-            adjustHeap(a, i, a.length - 1);
+    //堆排序
+    private static void heapSort(int[] nums){
+        for (int i=nums.length/2-1; i>=0; i--){
+            adjustHeap(nums,i,nums.length-1);
         }
-        //2.调整堆结构+交换堆顶元素与末尾元素
-        for (i = a.length - 1; i >= 0; i--) {
-            int temp = a[0];
-            a[0] = a[i];
-            a[i] = temp;
-            // 将a中前i-1个记录重新调整为大顶堆
-            adjustHeap(a, 0, i - 1);
+        for (int i=nums.length-1; i>=0; i--){
+            int tmp = nums[0];
+            nums[0] = nums[i];
+            nums[i] = tmp;
+            adjustHeap(nums,0,i-1);
         }
     }
-    private static void adjustHeap(int[] a, int i, int len){
-        int temp, j;
-        temp = a[i];
-        // 沿关键字较大的孩子结点向下筛选
-        for (j = 2 * i; j < len; j *= 2) {
-            if (a[j] < a[j + 1]){
-                ++j; // j为关键字中较大记录的下标
+
+    private static void adjustHeap(int[] nums, int index, int right){
+        int tmp = nums[index];
+        for (int j=2*index+1; j<=right; j=2*j+1){
+            if (j+1<=right && nums[j]<nums[j+1]){
+                j++;
             }
-            if (temp >= a[j]){
+            if (tmp > nums[j]){
                 break;
             }
-            a[i] = a[j];
-            i = j;
+            nums[index] = nums[j];
+            index = j;
         }
-        a[i] = temp;
+        nums[index] = tmp;
     }
 
-    /**
-     * 希尔
-     */
-    public static void shellSort(int[] a){
-        int j = 0;
-        int temp = 0;
-        for (int increment = a.length / 2; increment > 0; increment /= 2) {
-            for (int i = increment; i < a.length; i++) {
-                temp = a[i];
-                for (j = i - increment; j >= 0; j -= increment) {
-                    if (temp < a[j]) {
-                        a[j + increment] = a[j];
-                    } else {
-                        break;
-                    }
-                }
-                a[j + increment] = temp;
-            }
-        }
-    }
-
-    /**
-     * 桶排序
-     */
-    public static void bucketSort(int[] a){
-        int max = Integer.MIN_VALUE;
-        int min = Integer.MAX_VALUE;
-        for (int value : a) {
-            max = Math.max(max, value);
-            min = Math.min(min, value);
-        }
-        int num = (max - min)/a.length + 1;
-        ArrayList<ArrayList<Integer>> bucket = new ArrayList<ArrayList<Integer>>(num);
-        for (int i=0; i<num; i++){
-            bucket.add(new ArrayList<Integer>());
-        }
-        for (int value : a) {
-            int num1 = (value - min) / a.length;
-            bucket.get(num1).add(value);
-        }
-        for (int i=0; i<num; i++){
-            Collections.sort(bucket.get(i));
-        }
-        int count = 0;
-        for (int i=0; i<num; i++){
-            if (bucket.get(i) != null){
-                for (Integer integer : bucket.get(i)) {
-                    a[count] = integer;
-                    count++;
-                }
-            }
-        }
-    }
-
-    /**
-     * 归并排序（递归）
-     */
-    public static void mergeSort(int[] a){
-        sort(a, 0, a.length-1);
-    }
-    private static void sort(int[] a, int left, int right){
-        if (left >= right){
-            return;
-        }
-        int mid = (left + right)/2;
-        sort(a, left, mid);
-        sort(a, mid+1, right);
-        merge(a, left, mid, right);
-    }
-    private static void merge(int[] a, int left, int mid, int right){
-        int n = right - left + 1;
-        int[] tmp = new int[n];
-        int l = left;
-        int r = mid + 1;
-        int t = 0;
-        while (l <= mid && r <= right){
-            if (a[l] < a[r]){
-                tmp[t++] = a[l++];
-            }else {
-                tmp[t++] = a[r++];
-            }
-        }
-        while (l <= mid){
-            tmp[t++] = a[l++];
-        }
-        while (r <= right){
-            tmp[t++] = a[r++];
-        }
-        if (t >= 0) System.arraycopy(tmp, 0, a, left, t);
-    }
-
-    /**
-     * 归并排序（非递归）
-     * 分治
-     */
-    public static void sort(int[] a){
-        for (int n=1; n<a.length; n = n*2){
-            for (int i=0; i<a.length-n; i=i+2*n){
-                int mid = i+n-1;
-                int right = Math.min(i+2*n-1,a.length-1);
-                merge(a, i,mid,right);
-            }
+    public static void main(String[] args) {
+        int[] test = {2,4,6,8,1,3,5,7};
+        //selectSort(test);
+        //bubbleSort(test);
+        //insertSort(test);
+        //shellSort(test);
+        //mergeSort(test);
+        //quickSort(test);
+        heapSort(test);
+        for (int i : test){
+            System.out.println(i);
         }
     }
 }
