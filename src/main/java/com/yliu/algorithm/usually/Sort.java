@@ -166,8 +166,8 @@ public class Sort {
         //insertSort(test);
         //shellSort(test);
         //mergeSort(test);
-        //quickSort(test);
-        heapSort(test);
+        quickSort(test);
+        //heapSort(test);
         for (int i : test){
             System.out.println(i);
         }

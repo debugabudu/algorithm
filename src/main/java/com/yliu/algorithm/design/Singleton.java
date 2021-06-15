@@ -1,4 +1,4 @@
-package com.yliu.algorithm.usually;
+package com.yliu.algorithm.design;
 
 public class Singleton {
     //饿汉式，线程安全
