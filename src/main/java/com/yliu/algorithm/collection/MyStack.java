@@ -1,4 +1,4 @@
-package com.yliu.algorithm.usually;
+package com.yliu.algorithm.collection;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
