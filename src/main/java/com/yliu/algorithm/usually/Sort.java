@@ -158,18 +158,4 @@ public class Sort {
         }
         nums[index] = tmp;
     }
-
-    public static void main(String[] args) {
-        int[] test = {2,4,6,8,1,3,5,7};
-        //selectSort(test);
-        //bubbleSort(test);
-        //insertSort(test);
-        //shellSort(test);
-        //mergeSort(test);
-        quickSort(test);
-        //heapSort(test);
-        for (int i : test){
-            System.out.println(i);
-        }
-    }
 }

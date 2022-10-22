@@ -15,7 +15,7 @@ public class BinaryTree {
     /**
      * 层序（队列实现）
      * 根节点入队，队列不为空，当前节点出队并打印，左右节点入队
-     * 求二叉树深度：增加count和nextcount记录出队的节点数和该层进入的节点数，每次出队数等于一层进入数时depth++
+     * 求二叉树深度：1.递归  2.队列size为上一层节点数，全部出队为一层
      */
     public static void levelRecur(TreeNode root){
         Queue<TreeNode> helper = new LinkedList<>();
@@ -53,7 +53,8 @@ public class BinaryTree {
     }
 
     /**
-     * 中序遍历
+     * 中序遍历(二叉搜索树的中序遍历刚好是从小到大)
+     * 当前节点不为空或堆栈不为空，当前节点不为空，节点入栈，左节点入栈；节点为空，出栈并并打印，找出栈节点的右节点
      */
     public static void midRecur(TreeNode root){
         Stack<TreeNode> helper = new Stack<>();
@@ -100,7 +101,6 @@ public class BinaryTree {
     public TreeNode buildTree(int[] preOrder, int[] inOrder) {
         return helper(0,0,inOrder.length-1,preOrder,inOrder);
     }
-
     private TreeNode helper(int preStart, int inStart, int inEnd, int[] preOrder, int[] inOrder) {
         if (preStart>preOrder.length-1 || inStart>inEnd){
             return null;
@@ -147,60 +147,59 @@ public class BinaryTree {
      * 1)可用做队列,实现树的层次遍历
      * 2)可双向遍历,奇数层时从前向后遍历，偶数层时从后向前遍历
      */
-    public static void print(TreeNode root) {
-        LinkedList<TreeNode> helper = new LinkedList<>();
-        helper.addLast(null);
-        helper.addLast(root);
-        boolean leftToRight = true;
-        while (helper.size() != 1){
-            TreeNode node = helper.removeFirst();
-            Iterator<TreeNode> iterator;
-            if (node == null){
-                if (leftToRight){
-                    iterator = helper.iterator();
-                }else {
-                    iterator = helper.descendingIterator();
-                }
-                leftToRight = !leftToRight;
-                while (iterator.hasNext()){
-                    System.out.println(iterator.next().value);
-                }
-                helper.addLast(null);
-                continue;
-            }
-            if (node.left != null){
-                helper.addLast(node.left);
-            }
-            if (node.right != null){
-                helper.addLast(node.right);
-            }
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        List<List<Integer>> ans = new LinkedList<>();
+        if (root == null) {
+            return ans;
         }
+        Queue<TreeNode> nodeQueue = new LinkedList<>();
+        nodeQueue.offer(root);
+        boolean isOrderLeft = true;
+        while (!nodeQueue.isEmpty()) {
+            Deque<Integer> levelList = new LinkedList<>();
+            int size = nodeQueue.size();
+            for (int i = 0; i < size; ++i) {
+                TreeNode curNode = nodeQueue.poll();
+                if (isOrderLeft) {
+                    levelList.offerLast(curNode.value);
+                } else {
+                    levelList.offerFirst(curNode.value);
+                }
+                if (curNode.left != null) {
+                    nodeQueue.offer(curNode.left);
+                }
+                if (curNode.right != null) {
+                    nodeQueue.offer(curNode.right);
+                }
+            }
+            ans.add(new LinkedList<>(levelList));
+            isOrderLeft = !isOrderLeft;
+        }
+        return ans;
     }
 
-    public static void main(String[] args) {
-        TreeNode root = new TreeNode(2);
-        TreeNode t1 = new TreeNode(4);
-        TreeNode t2 = new TreeNode(6);
-        TreeNode t3 = new TreeNode(8);
-        TreeNode t4 = new TreeNode(1);
-        TreeNode t5 = new TreeNode(3);
-        TreeNode t6 = new TreeNode(5);
-        TreeNode t7 = new TreeNode(7);
-        root.left = t1;
-        root.right = t2;
-        t1.left = t3;
-        t1.right = t4;
-        t2.left = t5;
-        t2.right = t6;
-        t3.left = t7;
-        levelRecur(root);
-        System.out.println();
-        preRecur(root);
-        System.out.println();
-        midRecur(root);
-        System.out.println();
-        backRecur(root);
-        System.out.println();
-        print(root);
+    /**
+     * 给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
+     * 叶子节点 是指没有子节点的节点。
+     */
+    public List<List<Integer>> pathSum(TreeNode root, int target) {
+        List<List<Integer>> ret = new LinkedList<>();
+        Deque<Integer> path = new LinkedList<>();
+        dfs(root, target, ret, path);
+        return ret;
+    }
+
+    public void dfs(TreeNode root, int target, List<List<Integer>> ret, Deque<Integer> path) {
+        if (root == null) {
+            return;
+        }
+        path.offerLast(root.value);
+        target -= root.value;
+        if (root.left == null && root.right == null && target == 0) {
+            ret.add(new LinkedList<>(path));
+        }
+        dfs(root.left, target, ret, path);
+        dfs(root.right, target, ret, path);
+        path.pollLast();
     }
 }

@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class ProducerAndConsumer {
-    private final int SIZE = 10;
-    private Queue<Integer> queue = new LinkedList<>();
+    final int SIZE = 10;
+    Queue<Integer> queue = new LinkedList<>();
     class Producer extends Thread{
         @Override
         public void run() {

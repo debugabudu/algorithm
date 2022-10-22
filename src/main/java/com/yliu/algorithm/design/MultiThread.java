@@ -1,4 +1,4 @@
-package com.yliu.algorithm.usually;
+package com.yliu.algorithm.design;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

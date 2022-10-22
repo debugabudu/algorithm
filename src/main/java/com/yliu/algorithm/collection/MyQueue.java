@@ -25,34 +25,7 @@ public class MyQueue {
         return stack2.pop();
     }
 
-    public int peek(){
-        if (stack2.isEmpty()){
-            if (stack1.isEmpty()){
-                return -1;
-            }
-            while (!stack1.isEmpty()){
-                stack2.push(stack1.pop());
-            }
-        }
-        return stack2.peek();
-    }
-
     public boolean isEmpty(){
         return stack1.isEmpty() && stack2.isEmpty();
-    }
-
-    public static void main(String[] args) {
-        MyQueue queue = new MyQueue();
-        queue.offer(1);
-        queue.offer(2);
-        queue.offer(3);
-        System.out.println(queue.poll());
-        System.out.println(queue.poll());
-        queue.offer(4);
-        System.out.println(queue.poll());
-        queue.offer(5);
-        System.out.println(queue.poll());
-        System.out.println(queue.poll());
-        System.out.println(queue.poll());
     }
 }
