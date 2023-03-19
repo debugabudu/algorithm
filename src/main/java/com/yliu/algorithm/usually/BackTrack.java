@@ -38,7 +38,8 @@ public class BackTrack {
 
     /**
      * 给定一个m x n 二维字符网格board 和一个字符串单词word 。如果word 存在于网格中，返回 true ；否则，返回 false 。
-     * 单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用
+     * 单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。
+     * 同一个单元格内的字母不允许被重复使用
      */
     public boolean exist(char[][] board, String word) {
         int h = board.length, w = board[0].length;
@@ -80,7 +81,8 @@ public class BackTrack {
     }
 
     /**
-     * 给你一个 无重复元素 的整数数组candidates 和一个目标整数target，找出candidates中可以使数字和为目标数target 的 所有不同组合 ，并以列表形式返回。你可以按 任意顺序 返回这些组合。
+     * 给你一个 无重复元素 的整数数组candidates 和一个目标整数target，找出candidates中可以使数字和为目标数target 的 所有不同组合 ，
+     * 并以列表形式返回。你可以按 任意顺序 返回这些组合。
      * candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。
      */
     public List<List<Integer>> combinationSum(int[] candidates, int target) {

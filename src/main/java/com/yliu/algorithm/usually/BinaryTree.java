@@ -17,13 +17,14 @@ public class BinaryTree {
      * 根节点入队，队列不为空，当前节点出队并打印，左右节点入队
      * 求二叉树深度：1.递归  2.队列size为上一层节点数，全部出队为一层
      */
-    public static void levelRecur(TreeNode root){
+    public static List<TreeNode> levelRecur(TreeNode root){
+        List<TreeNode> res = new ArrayList<>();
         Queue<TreeNode> helper = new LinkedList<>();
         TreeNode current = root;
         helper.offer(current);
         while (!helper.isEmpty()){
             current = helper.poll();
-            System.out.println(current.value);
+            res.add(current);
             if (current.left != null){
                 helper.offer(current.left);
             }
@@ -31,32 +32,36 @@ public class BinaryTree {
                 helper.offer(current.right);
             }
         }
+        return res;
     }
 
     /**
      * 前序非递归（堆栈实现）
      * 当前节点不为空或堆栈不为空，当前节点不为空，节点入栈并打印，左节点入栈；节点为空，出栈并找出栈节点的右节点
      */
-    public static void preRecur(TreeNode root){
+    public static List<TreeNode> preRecur(TreeNode root){
+        List<TreeNode> res = new ArrayList<>();
         Stack<TreeNode> helper = new Stack<>();
         TreeNode current = root;
         while (current != null || !helper.isEmpty()){
             if (current != null){
                 helper.push(current);
-                System.out.println(current.value);
+                res.add(current);
                 current = current.left;
             }else {
                 current = helper.pop();
                 current = current.right;
             }
         }
+        return res;
     }
 
     /**
      * 中序遍历(二叉搜索树的中序遍历刚好是从小到大)
      * 当前节点不为空或堆栈不为空，当前节点不为空，节点入栈，左节点入栈；节点为空，出栈并并打印，找出栈节点的右节点
      */
-    public static void midRecur(TreeNode root){
+    public static List<TreeNode> midRecur(TreeNode root){
+        List<TreeNode> res = new ArrayList<>();
         Stack<TreeNode> helper = new Stack<>();
         TreeNode current = root;
         while (current != null || !helper.isEmpty()){
@@ -65,17 +70,20 @@ public class BinaryTree {
                 current = current.left;
             }else {
                 current = helper.pop();
-                System.out.println(current.value);
+                res.add(current);
                 current = current.right;
             }
         }
+        return res;
     }
 
     /**
      * 后序非递归（堆栈实现）
-     * 增加一个辅助输出堆栈；当前节点不为空或堆栈不为空，当前节点不为空，节点入栈与辅助栈，右节点入栈；节点为空，出栈并找出栈节点的左节点，打印辅助堆栈。
+     * 增加一个辅助输出堆栈；当前节点不为空或堆栈不为空，当前节点不为空，节点入栈与辅助栈，右节点入栈；
+     * 节点为空，出栈并找出栈节点的左节点，打印辅助堆栈。
      */
-    public static void backRecur(TreeNode root){
+    public static List<TreeNode> backRecur(TreeNode root){
+        List<TreeNode> res = new ArrayList<>();
         Stack<TreeNode> helper1 = new Stack<>();
         Stack<TreeNode> helper2 = new Stack<>();
         TreeNode current = root;
@@ -90,8 +98,9 @@ public class BinaryTree {
             }
         }
         while (!helper2.isEmpty()){
-            System.out.println(helper2.pop().value);
+            res.add(helper2.pop());
         }
+        return res;
     }
 
     /**
@@ -139,43 +148,6 @@ public class BinaryTree {
         node.left = helper1(endPost-inEnd+index-1,inStart,index-1,inOrder,postOrder);
         node.right = helper1(endPost-1,index+1,inEnd,inOrder,postOrder);
         return node;
-    }
-
-    /**
-     * 之字形打印二叉树
-     * 思路：利用Java中的LinkedList的底层实现是双向链表的特点。
-     * 1)可用做队列,实现树的层次遍历
-     * 2)可双向遍历,奇数层时从前向后遍历，偶数层时从后向前遍历
-     */
-    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
-        List<List<Integer>> ans = new LinkedList<>();
-        if (root == null) {
-            return ans;
-        }
-        Queue<TreeNode> nodeQueue = new LinkedList<>();
-        nodeQueue.offer(root);
-        boolean isOrderLeft = true;
-        while (!nodeQueue.isEmpty()) {
-            Deque<Integer> levelList = new LinkedList<>();
-            int size = nodeQueue.size();
-            for (int i = 0; i < size; ++i) {
-                TreeNode curNode = nodeQueue.poll();
-                if (isOrderLeft) {
-                    levelList.offerLast(curNode.value);
-                } else {
-                    levelList.offerFirst(curNode.value);
-                }
-                if (curNode.left != null) {
-                    nodeQueue.offer(curNode.left);
-                }
-                if (curNode.right != null) {
-                    nodeQueue.offer(curNode.right);
-                }
-            }
-            ans.add(new LinkedList<>(levelList));
-            isOrderLeft = !isOrderLeft;
-        }
-        return ans;
     }
 
     /**

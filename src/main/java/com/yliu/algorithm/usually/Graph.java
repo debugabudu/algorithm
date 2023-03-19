@@ -8,7 +8,8 @@ import java.util.*;
 public class Graph {
     /**
      * 给你一个大小为 m x n 的二进制矩阵 grid 。
-     * 岛屿是由一些相邻的1(代表土地) 构成的组合，这里的「相邻」要求两个 1 必须在 水平或者竖直的四个方向上 相邻。你可以假设grid 的四个边缘都被 0（代表水）包围着。
+     * 岛屿是由一些相邻的1(代表土地) 构成的组合，这里的「相邻」要求两个 1 必须在 水平或者竖直的四个方向上 相邻。
+     * 你可以假设grid 的四个边缘都被 0（代表水）包围着。
      * 岛屿的面积是岛上值为 1 的单元格的数目。
      * 计算并返回 grid 中最大的岛屿面积。如果没有岛屿，则返回面积为 0
      */
@@ -23,47 +24,18 @@ public class Graph {
                 stackj.push(j);
                 while (!stacki.isEmpty()) {
                     int cur_i = stacki.pop(), cur_j = stackj.pop();
-                    if (cur_i < 0 || cur_j < 0 || cur_i == grid.length || cur_j == grid[0].length || grid[cur_i][cur_j] != 1) {
+                    if (cur_i < 0 || cur_j < 0 || cur_i == grid.length
+                            || cur_j == grid[0].length || grid[cur_i][cur_j] != 1) {
                         continue;
                     }
                     ++cur;
                     grid[cur_i][cur_j] = 0;
                     int[] di = {0, 0, 1, -1};
                     int[] dj = {1, -1, 0, 0};
-                    for (int index = 0; index != 4; ++index) {
+                    for (int index = 0; index < 4; ++index) {
                         int next_i = cur_i + di[index], next_j = cur_j + dj[index];
                         stacki.push(next_i);
                         stackj.push(next_j);
-                    }
-                }
-                ans = Math.max(ans, cur);
-            }
-        }
-        return ans;
-    }
-
-    public int bfs(int[][] grid) {
-        int ans = 0;
-        for (int i = 0; i != grid.length; ++i) {
-            for (int j = 0; j != grid[0].length; ++j) {
-                int cur = 0;
-                Queue<Integer> queuei = new LinkedList<>();
-                Queue<Integer> queuej = new LinkedList<>();
-                queuei.offer(i);
-                queuej.offer(j);
-                while (!queuei.isEmpty()) {
-                    int cur_i = queuei.poll(), cur_j = queuej.poll();
-                    if (cur_i < 0 || cur_j < 0 || cur_i == grid.length || cur_j == grid[0].length || grid[cur_i][cur_j] != 1) {
-                        continue;
-                    }
-                    ++cur;
-                    grid[cur_i][cur_j] = 0;
-                    int[] di = {0, 0, 1, -1};
-                    int[] dj = {1, -1, 0, 0};
-                    for (int index = 0; index != 4; ++index) {
-                        int next_i = cur_i + di[index], next_j = cur_j + dj[index];
-                        queuei.offer(next_i);
-                        queuej.offer(next_j);
                     }
                 }
                 ans = Math.max(ans, cur);
@@ -76,12 +48,12 @@ public class Graph {
      * 给定一个由 0 和 1 组成的矩阵 mat，请输出一个大小相同的矩阵，其中每一个格子是 mat 中对应位置元素到最近的 0 的距离。
      * 两个相邻元素间的距离为 1 。
      */
-    public int[][] bfs1(int[][] matrix) {
+    public int[][] bfs(int[][] matrix) {
         int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         int m = matrix.length, n = matrix[0].length;
         int[][] dist = new int[m][n];
         boolean[][] seen = new boolean[m][n];
-        Queue<int[]> queue = new LinkedList<int[]>();
+        Queue<int[]> queue = new LinkedList<>();
         // 将所有的 0 添加进初始队列中
         for (int i = 0; i < m; ++i) {
             for (int j = 0; j < n; ++j) {
@@ -286,33 +258,11 @@ public class Graph {
     }
 
     /**
-     * 给你一个有n个节点的 有向无环图（DAG），请你找出所有从节点 0到节点 n-1的路径并输出（不要求按特定顺序）
-     * graph[i]是一个从节点 i 可以访问的所有节点的列表（即从节点 i 到节点graph[i][j]存在一条有向边）。
-     */
-    public List<List<Integer>> allPathsSourceTarget(int[][] graph) {
-        List<List<Integer>> ans = new ArrayList<>();
-        Deque<Integer> stack = new ArrayDeque<>();
-        stack.offerLast(0);
-        dfs(graph, 0, graph.length - 1, ans, stack);
-        return ans;
-    }
-
-    public void dfs(int[][] graph, int x, int n, List<List<Integer>> ans, Deque<Integer> stack) {
-        if (x == n) {
-            ans.add(new ArrayList<>(stack));
-            return;
-        }
-        for (int y : graph[x]) {
-            stack.offerLast(y);
-            dfs(graph, y, n, ans, stack);
-            stack.pollLast();
-        }
-    }
-
-    /**
-     * 用以太网线缆将n台计算机连接成一个网络，计算机的编号从0到n-1。线缆用connections表示，其中connections[i] = [a, b]连接了计算机a和b。
+     * 用以太网线缆将n台计算机连接成一个网络，计算机的编号从0到n-1。
+     * 线缆用connections表示，其中connections[i] = [a, b]连接了计算机a和b。
      * 网络中的任何一台计算机都可以通过网络直接或者间接访问同一个网络中其他任意一台计算机。
-     * 给你这个计算机网络的初始布线connections，你可以拔开任意两台直连计算机之间的线缆，并用它连接一对未直连的计算机。请你计算并返回使所有计算机都连通所需的最少操作次数。如果不可能，则返回-1 。
+     * 给你这个计算机网络的初始布线connections，你可以拔开任意两台直连计算机之间的线缆，并用它连接一对未直连的计算机。
+     * 请你计算并返回使所有计算机都连通所需的最少操作次数。如果不可能，则返回-1 。
      */
     public int makeConnected(int n, int[][] connections) {
         if (connections.length < n - 1) {
@@ -348,8 +298,10 @@ public class Graph {
     }
 
     /**
-     * 有一个有 n 个节点的有向图，节点按 0 到 n - 1 编号。图由一个 索引从 0 开始 的 2D 整数数组graph表示，graph[i]是与节点 i 相邻的节点的整数数组，这意味着从节点 i 到graph[i]中的每个节点都有一条边。
-     * 如果一个节点没有连出的有向边，则它是 终端节点 。如果没有出边，则节点为终端节点。如果从该节点开始的所有可能路径都通向 终端节点 ，则该节点为 安全节点 。
+     * 有一个有 n 个节点的有向图，节点按 0 到 n - 1 编号。图由一个 索引从 0 开始 的 2D 整数数组graph表示，
+     * graph[i]是与节点 i 相邻的节点的整数数组，这意味着从节点 i 到graph[i]中的每个节点都有一条边。
+     * 如果一个节点没有连出的有向边，则它是 终端节点 。如果没有出边，则节点为终端节点。
+     * 如果从该节点开始的所有可能路径都通向 终端节点 ，则该节点为 安全节点 。
      * 返回一个由图中所有 安全节点 组成的数组作为答案。答案数组中的元素应当按 升序 排列。
      */
     public List<Integer> eventualSafeNodes(int[][] graph) {
@@ -411,9 +363,11 @@ public class Graph {
             // 把 Y 壶倒空。
             stack.push(new int[]{remain_x, 0});
             // 把 X 壶的水灌进 Y 壶，直至灌满或倒空。
-            stack.push(new int[]{remain_x - Math.min(remain_x, y - remain_y), remain_y + Math.min(remain_x, y - remain_y)});
+            stack.push(new int[]{remain_x - Math.min(remain_x, y - remain_y),
+                    remain_y + Math.min(remain_x, y - remain_y)});
             // 把 Y 壶的水灌进 X 壶，直至灌满或倒空。
-            stack.push(new int[]{remain_x + Math.min(remain_y, x - remain_x), remain_y - Math.min(remain_y, x - remain_x)});
+            stack.push(new int[]{remain_x + Math.min(remain_y, x - remain_x),
+                    remain_y - Math.min(remain_y, x - remain_x)});
         }
         return false;
     }
@@ -423,7 +377,8 @@ public class Graph {
     }
 
     /**
-     * 你有一个带有四个圆形拨轮的转盘锁。每个拨轮都有10个数字： '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' 。每个拨轮可以自由旋转：例如把 '9' 变为 '0'，'0' 变为 '9' 。每次旋转都只能旋转一个拨轮的一位数字。
+     * 你有一个带有四个圆形拨轮的转盘锁。每个拨轮都有10个数字： '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' 。
+     * 每个拨轮可以自由旋转：例如把 '9' 变为'0'，'0' 变为 '9' 。每次旋转都只能旋转一个拨轮的一位数字。
      * 锁的初始数字为 '0000' ，一个代表四个拨轮的数字的字符串。
      * 列表 deadends 包含了一组死亡数字，一旦拨轮的数字和列表里的任何一个元素相同，这个锁将会被永久锁定，无法再被旋转。
      * 字符串 target 代表可以解锁的数字，你需要给出解锁需要的最小旋转次数，如果无论如何不能解锁，返回 -1 。
@@ -433,10 +388,7 @@ public class Graph {
             return 0;
         }
 
-        Set<String> dead = new HashSet<>();
-        for (String deadend : deadends) {
-            dead.add(deadend);
-        }
+        Set<String> dead = new HashSet<>(Arrays.asList(deadends));
         if (dead.contains("0000")) {
             return -1;
         }
@@ -492,7 +444,8 @@ public class Graph {
 
     /**
      * 给定一组n人（编号为1, 2, ..., n），我们想把每个人分进任意大小的两组。每个人都可能不喜欢其他人，那么他们不应该属于同一组。
-     * 给定整数 n和数组 dislikes，其中dislikes[i] = [ai, bi]，表示不允许将编号为 ai和bi的人归入同一组。当可以用这种方法将所有人分进两组时，返回 true；否则返回 false。
+     * 给定整数 n和数组 dislikes，其中dislikes[i] = [ai, bi]，表示不允许将编号为 ai和bi的人归入同一组。
+     * 当可以用这种方法将所有人分进两组时，返回 true；否则返回 false。
      */
     public boolean possibleBipartition(int N, int[][] dislikes) {
         ArrayList<Integer>[] graph = new ArrayList[N+1];
@@ -523,8 +476,10 @@ public class Graph {
 
     /**
      * 拓扑排序
-     * 给定一个长度为 n 的整数数组 nums ，其中 nums 是范围为 [1，n] 的整数的排列。还提供了一个 2D 整数数组sequences，其中sequences[i]是nums的子序列。
-     * 检查 nums 是否是唯一的最短超序列 。最短 超序列 是 长度最短 的序列，并且所有序列sequences[i]都是它的子序列。对于给定的数组sequences，可能存在多个有效的 超序列 。
+     * 给定一个长度为 n 的整数数组 nums ，其中 nums 是范围为 [1，n] 的整数的排列。
+     * 还提供了一个 2D 整数数组sequences，其中sequences[i]是nums的子序列。
+     * 检查 nums 是否是唯一的最短超序列 。最短 超序列 是 长度最短 的序列，并且所有序列sequences[i]都是它的子序列。
+     * 对于给定的数组sequences，可能存在多个有效的 超序列 。
      *
      * 例如，对于sequences = [[1,2],[1,3]]，有两个最短的 超序列 ，[1,2,3] 和 [1,3,2] 。
      * 而对于sequences = [[1,2],[1,3],[1,2,3]]，唯一可能的最短 超序列 是 [1,2,3] 。[1,2,3,4] 是可能的超序列，但不是最短的。
