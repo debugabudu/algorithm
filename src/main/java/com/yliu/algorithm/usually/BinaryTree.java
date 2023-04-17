@@ -174,4 +174,38 @@ public class BinaryTree {
         dfs(root.right, target, ret, path);
         path.pollLast();
     }
+
+    /**
+     * 删除二叉搜索树中的节点
+     */
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if (root == null) {
+            return null;
+        }
+        if (root.value > key) {
+            root.left = deleteNode(root.left, key);
+            return root;
+        }
+        if (root.value < key) {
+            root.right = deleteNode(root.right, key);
+            return root;
+        }
+        if (root.left == null && root.right == null) {
+            return null;
+        }
+        if (root.right == null) {
+            return root.left;
+        }
+        if (root.left == null) {
+            return root.right;
+        }
+        TreeNode successor = root.right;
+        while (successor.left != null) {
+            successor = successor.left;
+        }
+        root.right = deleteNode(root.right, successor.value);
+        successor.right = root.right;
+        successor.left = root.left;
+        return successor;
+    }
 }

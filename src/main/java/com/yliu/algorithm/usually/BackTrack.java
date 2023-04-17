@@ -1,6 +1,7 @@
 package com.yliu.algorithm.usually;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,6 +34,35 @@ public class BackTrack {
             backtrack(n, output, res, first + 1);
             // 撤销操作
             Collections.swap(output, first, i);
+        }
+    }
+
+    /**
+     * 给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。
+     */
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> perm = new ArrayList<>();
+        boolean[] vis = new boolean[nums.length];
+        Arrays.sort(nums);
+        backtrack(nums, ans, 0, perm, vis);
+        return ans;
+    }
+
+    public void backtrack(int[] nums, List<List<Integer>> ans, int idx, List<Integer> perm, boolean[] vis) {
+        if (idx == nums.length) {
+            ans.add(new ArrayList<>(perm));
+            return;
+        }
+        for (int i = 0; i < nums.length; ++i) {
+            if (vis[i] || (i > 0 && nums[i] == nums[i - 1] && !vis[i - 1])) {
+                continue;
+            }
+            perm.add(nums[i]);
+            vis[i] = true;
+            backtrack(nums, ans, idx + 1, perm, vis);
+            vis[i] = false;
+            perm.remove(idx);
         }
     }
 
@@ -108,5 +138,83 @@ public class BackTrack {
             dfs(candidates, target - candidates[idx], ans, combine, idx);
             combine.remove(combine.size() - 1);
         }
+    }
+
+    /**
+     * 给定一个候选人编号的集合candidates和一个目标数target，找出candidates中所有可以使数字和为target的组合。
+     * candidates中的每个数字在每个组合中只能使用一次。
+     * 解集不能包含重复的组合
+     */
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        boolean[] used = new boolean[candidates.length];
+        // 加标志数组，用来辅助判断同层节点是否已经遍历
+        Arrays.fill(used, false);
+        // 为了将重复的数字都放到一起，所以先进行排序
+        Arrays.sort(candidates);
+        backTracking(candidates, target, 0, ans, path, used, 0);
+        return ans;
+    }
+
+    private void backTracking(int[] candidates, int target, int startIndex, List<List<Integer>> ans,
+                              List<Integer> path, boolean[] used, int sum) {
+        if (sum == target) {
+            ans.add(new ArrayList<>(path));
+        }
+        for (int i = startIndex; i < candidates.length; i++) {
+            if (sum + candidates[i] > target) {
+                break;
+            }
+            // 出现重复节点，同层的第一个节点已经被访问过，所以直接跳过
+            if (i > 0 && candidates[i] == candidates[i - 1] && !used[i - 1]) {
+                continue;
+            }
+            used[i] = true;
+            sum += candidates[i];
+            path.add(candidates[i]);
+            // 每个节点仅能选择一次，所以从下一位开始
+            backTracking(candidates, target, i + 1, ans, path, used, sum);
+            used[i] = false;
+            sum -= candidates[i];
+            path.remove(path.size()-1);
+        }
+    }
+
+    /**
+     * 给你一个字符串 s，请你将 s 分割成一些子串，使每个子串都是 回文串 。返回 s 所有可能的分割方案。
+     */
+    public List<List<String>> partition(String s) {
+        List<List<String>> res = new ArrayList<>();
+        List<String> path = new ArrayList<>();
+        backTracking(s, 0, res, path);
+        return res;
+    }
+
+    private void backTracking(String s, int index, List<List<String>> res, List<String> path){
+        if (index >= s.length()){
+            res.add(new ArrayList<>(path));
+            return;
+        }
+        for (int i=index; i<s.length(); i++){
+            if (isValid(s, index, i)){
+                path.add(s.substring(index, i+1));
+            }else {
+                continue;
+            }
+            backTracking(s, i+1, res, path);
+            path.remove(path.size()-1);
+        }
+    }
+
+    private boolean isValid(String s, int l, int r){
+        while (l < r){
+            if (s.charAt(l) != s.charAt(r)){
+                return false;
+            }
+            l++;
+            r--;
+        }
+        return true;
     }
 }

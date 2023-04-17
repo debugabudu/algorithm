@@ -6,6 +6,8 @@ import java.util.List;
 public class Dynamic {
     /**
      * 给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+     * 0-1背包变种：可以用二维数组解决-简化为1维
+     * 一维数组双重循环，外层遍历nums(物品)，内层dp数组从后向前遍历（容量）
      */
     public boolean canPartition(int[] nums) {
         int n = nums.length;
@@ -38,6 +40,10 @@ public class Dynamic {
      * 给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
      * 计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总金额，返回-1 。
      * 你可以认为每种硬币的数量是无限的。
+     * 多重背包：物品可选多次
+     * 求组合数：外层物品，内层背包
+     * 求排列数：外层背包，内层物品
+     * 本题是求最小，两种遍历都可以
      */
     public int coinChange(int[] coins, int amount) {
         int max = amount + 1;
@@ -218,23 +224,6 @@ public class Dynamic {
     }
 
     /**
-     * 给你一根长度为 n 的绳子，请把绳子剪成整数长度的 m 段（m、n都是整数，n>1并且m>1），每段绳子的长度记为 k[0],k[1]...k[m-1] 。
-     * 请问 k[0]*k[1]*...*k[m-1] 可能的最大乘积是多少？
-     * 例如，当绳子的长度是8时，我们把它剪成长度分别为2、3、3的三段，此时得到的最大乘积是18。
-     */
-    public int cuttingRope(int n) {
-        if (n <= 3) {
-            return n - 1;
-        }
-        int[] dp = new int[n + 1];
-        dp[2] = 1;
-        for (int i = 3; i <= n; i++) {
-            dp[i] = Math.max(Math.max(2 * (i - 2), 2 * dp[i - 2]), Math.max(3 * (i - 3), 3 * dp[i - 3]));
-        }
-        return dp[n];
-    }
-
-    /**
      * 给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果不存在 公共子序列 ，返回 0 。
      */
     public int longestCommonSubsequence(String text1, String text2) {
@@ -252,5 +241,60 @@ public class Dynamic {
             }
         }
         return dp[m][n];
+    }
+
+    /**
+     * 经典题：编辑距离
+     * 给你两个单词word1 和word2， 请返回将word1转换成word2所使用的最少操作数。
+     * 你可以对一个单词进行如下三种操作：
+     * 插入一个字符
+     * 删除一个字符
+     * 替换一个字符
+     */
+    public int minDistance(String word1, String word2) {
+        int m = word1.length();
+        int n = word2.length();
+        int[][] dp = new int[m + 1][n + 1];
+        // 初始化
+        for (int i = 1; i <= m; i++) {
+            dp[i][0] =  i;
+        }
+        for (int j = 1; j <= n; j++) {
+            dp[0][j] = j;
+        }
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                // 因为dp数组有效位从1开始
+                // 所以当前遍历到的字符串的位置为i-1 | j-1
+                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = Math.min(Math.min(dp[i - 1][j - 1], dp[i][j - 1]), dp[i - 1][j]) + 1;
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+    /**
+     * 给你一个字符串 s ，找出其中最长的回文子序列，并返回该序列的长度。
+     * 子序列定义为：不改变剩余字符顺序的情况下，删除某些字符或者不删除任何字符形成的一个序列。
+     */
+    public int longestPalindromeSubseq(String s) {
+        int n = s.length();
+        int[][] dp = new int[n][n];
+        for (int i = n - 1; i >= 0; i--) {
+            dp[i][i] = 1;
+            char c1 = s.charAt(i);
+            for (int j = i + 1; j < n; j++) {
+                char c2 = s.charAt(j);
+                if (c1 == c2) {
+                    dp[i][j] = dp[i + 1][j - 1] + 2;
+                } else {
+                    dp[i][j] = Math.max(dp[i + 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+        return dp[0][n - 1];
     }
 }
