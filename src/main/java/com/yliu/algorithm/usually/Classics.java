@@ -1,6 +1,6 @@
 package com.yliu.algorithm.usually;
 
-import com.yliu.algorithm.collection.Trie;
+import com.yliu.structure.advance.Trie;
 
 import java.util.*;
 

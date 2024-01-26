@@ -1,6 +1,34 @@
-package com.yliu.algorithm.usually;
+package com.yliu.algorithm.custom;
 
+/**
+ * 区间表示：
+ * [l,r],l<=r,l=m+1,r=m-1
+ * [l,r),l<r,l=m+1,r=m
+ */
 public class BinarySearch {
+    /**
+     * 二分查找插入点（无重复元素）
+     * 有重复直接else j=m-1即可
+     * 变种：查找重复数组中目标元素的边界
+     *   左边界：等同插入重复数组
+     *   右边界：等同找target+1的左边界-1
+     */
+    int binarySearchInsertionSimple(int[] nums, int target) {
+        int i = 0, j = nums.length - 1; // 初始化双闭区间 [0, n-1]
+        while (i <= j) {
+            int m = i + (j - i) / 2; // 计算中点索引 m
+            if (nums[m] < target) {
+                i = m + 1; // target 在区间 [m+1, j] 中
+            } else if (nums[m] > target) {
+                j = m - 1; // target 在区间 [i, m-1] 中
+            } else {
+                return m; // 找到 target ，返回插入点 m
+            }
+        }
+        // 未找到 target ，返回插入点 i
+        return i;
+    }
+
     /**
      * 给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
      * 如果数组中不存在目标值 target，返回[-1, -1]。

@@ -1,8 +1,12 @@
-package com.yliu.algorithm.usually;
+package com.yliu.algorithm.custom;
 
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 动态规划
+ * 0-1背包、完全背包、多重背包
+ */
 public class Dynamic {
     /**
      * 给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
@@ -269,6 +273,7 @@ public class Dynamic {
                 if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
                     dp[i][j] = dp[i - 1][j - 1];
                 } else {
+                    // 最少编辑步数 = 插入、删除、替换这三种操作的最少编辑步数 + 1
                     dp[i][j] = Math.min(Math.min(dp[i - 1][j - 1], dp[i][j - 1]), dp[i - 1][j]) + 1;
                 }
             }
@@ -280,7 +285,7 @@ public class Dynamic {
      * 给你一个字符串 s ，找出其中最长的回文子序列，并返回该序列的长度。
      * 子序列定义为：不改变剩余字符顺序的情况下，删除某些字符或者不删除任何字符形成的一个序列。
      */
-    public int longestPalindromeSubseq(String s) {
+    public int longestPalindromeSubSeq(String s) {
         int n = s.length();
         int[][] dp = new int[n][n];
         for (int i = n - 1; i >= 0; i--) {

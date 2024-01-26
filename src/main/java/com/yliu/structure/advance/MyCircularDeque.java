@@ -1,4 +1,6 @@
-package com.yliu.algorithm.collection;
+package com.yliu.structure.advance;
+
+import com.yliu.structure.base.ListNode;
 
 /**
  * 双向循环链表

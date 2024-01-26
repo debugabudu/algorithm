@@ -383,12 +383,12 @@ public class Graph {
      * 列表 deadends 包含了一组死亡数字，一旦拨轮的数字和列表里的任何一个元素相同，这个锁将会被永久锁定，无法再被旋转。
      * 字符串 target 代表可以解锁的数字，你需要给出解锁需要的最小旋转次数，如果无论如何不能解锁，返回 -1 。
      */
-    public int openLock(String[] deadends, String target) {
+    public int openLock(String[] deadEnds, String target) {
         if ("0000".equals(target)) {
             return 0;
         }
 
-        Set<String> dead = new HashSet<>(Arrays.asList(deadends));
+        Set<String> dead = new HashSet<>(Arrays.asList(deadEnds));
         if (dead.contains("0000")) {
             return -1;
         }
@@ -447,7 +447,7 @@ public class Graph {
      * 给定整数 n和数组 dislikes，其中dislikes[i] = [ai, bi]，表示不允许将编号为 ai和bi的人归入同一组。
      * 当可以用这种方法将所有人分进两组时，返回 true；否则返回 false。
      */
-    public boolean possibleBipartition(int N, int[][] dislikes) {
+    public boolean possibleBiPartition(int N, int[][] dislikes) {
         ArrayList<Integer>[] graph = new ArrayList[N+1];
         Map<Integer, Integer> color = new HashMap<>();
         for (int i = 1; i <= N; ++i)
@@ -488,7 +488,7 @@ public class Graph {
      */
     public boolean sequenceReconstruction(int[] nums, int[][] sequences) {
         int n = nums.length;
-        int[] indegrees = new int[n + 1];
+        int[] inDegrees = new int[n + 1];
         Set<Integer>[] graph = new Set[n + 1];
         for (int i = 1; i <= n; i++) {
             graph[i] = new HashSet<>();
@@ -498,13 +498,13 @@ public class Graph {
             for (int i = 1; i < size; i++) {
                 int prev = sequence[i - 1], next = sequence[i];
                 if (graph[prev].add(next)) {
-                    indegrees[next]++;
+                    inDegrees[next]++;
                 }
             }
         }
         Queue<Integer> queue = new ArrayDeque<>();
         for (int i = 1; i <= n; i++) {
-            if (indegrees[i] == 0) {
+            if (inDegrees[i] == 0) {
                 queue.offer(i);
             }
         }
@@ -515,8 +515,8 @@ public class Graph {
             int num = queue.poll();
             Set<Integer> set = graph[num];
             for (int next : set) {
-                indegrees[next]--;
-                if (indegrees[next] == 0) {
+                inDegrees[next]--;
+                if (inDegrees[next] == 0) {
                     queue.offer(next);
                 }
             }

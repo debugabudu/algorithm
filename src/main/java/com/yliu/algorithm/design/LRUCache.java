@@ -1,4 +1,4 @@
-package com.yliu.algorithm.collection;
+package com.yliu.algorithm.design;
 
 import java.util.HashMap;
 import java.util.Map;

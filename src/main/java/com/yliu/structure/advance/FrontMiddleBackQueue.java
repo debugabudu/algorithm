@@ -1,4 +1,4 @@
-package com.yliu.algorithm.collection;
+package com.yliu.structure.advance;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -59,7 +59,7 @@ class FrontMiddleBackQueue {
         if (left.isEmpty()) {
             return -1;
         }
-        int val = 0;
+        int val;
         if (right.isEmpty()) {
             val = left.pollLast();
         } else {

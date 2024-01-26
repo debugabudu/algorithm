@@ -1,4 +1,4 @@
-package com.yliu.algorithm.collection;
+package com.yliu.structure.base;
 
 import java.util.ArrayDeque;
 import java.util.Queue;

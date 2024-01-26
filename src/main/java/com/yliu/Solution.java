@@ -1,4 +1,4 @@
-package com.yliu.algorithm;
+package com.yliu;
 
 public class Solution {
 

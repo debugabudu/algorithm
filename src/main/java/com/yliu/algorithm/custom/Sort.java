@@ -1,10 +1,14 @@
-package com.yliu.algorithm.usually;
+package com.yliu.algorithm.custom;
 
 /**
  * 排序
  */
 public class Sort {
-    //选择排序
+    /**
+     * 选择排序
+     * 每次找到最小的元素，与未排序中的第一个元素交换
+     * 时间-O(n2)，空间-O(1)，非稳定
+     */
     private static void selectSort(int[] nums){
         if (nums == null || nums.length<=1){
             return;
@@ -24,20 +28,35 @@ public class Sort {
         }
     }
 
-    //冒泡排序
+    /**
+     * 冒泡排序
+     * 每次从左开始向右遍历，依次比较相邻元素大小，如果“左元素 > 右元素”就交换二者。
+     * 时间-O(n2)，空间-O(1)，稳定
+     */
     private static void bubbleSort(int[] nums){
-        for (int i=0; i<nums.length-1; i++){
-            for (int j=0; j<nums.length-i-1; j++){
+        for (int i=nums.length-1; i>0; i--){
+            //优化，如果某层未进行交换，说明已经有序
+            boolean flag = false;
+            for (int j=0; j<i; j++){
                 if (nums[j] > nums[j+1]){
                     int tmp = nums[j];
                     nums[j] = nums[j+1];
                     nums[j+1] = tmp;
+                    flag = true;
                 }
+            }
+            if (!flag){
+                break;
             }
         }
     }
 
-    //插入排序
+    /**
+     * 插入排序-比冒泡操作单元更少，比选择效率高
+     * 左侧元素认为已排序，将右边未排序的元素依次插入左侧已排序中
+     * 时间-O(n2)，空间-O(1)，稳定
+     * java内置排序函数-短数组用插入，长数组用快排
+     */
     private static void insertSort(int[] nums){
         for (int i=1; i<nums.length; i++){
             int tmp = nums[i];
@@ -50,7 +69,11 @@ public class Sort {
         }
     }
 
-    //希尔排序
+    /**
+     * 希尔排序-插入排序的变种
+     * 设置步长，每间隔一个步长的元素为一组，每组内进行插入排序，逐渐缩短步长
+     * 时间-O(n2)，空间-O(1)，稳定
+     */
     private static void shellSort(int[] nums){
         for (int gap=nums.length/2; gap>0; gap/=2){
             for (int i=gap; i<nums.length; i++){
@@ -65,7 +88,11 @@ public class Sort {
         }
     }
 
-    //归并排序
+    /**
+     * 归并排序
+     * 将数组不断从中间划分，再将左右的子数组合并成一个有序数组
+     * 时间-O(nlogn)，空间-O(n)，稳定
+     */
     private static void mergeSort(int[] nums){
         sort(nums,0,nums.length-1);
     }
@@ -101,7 +128,11 @@ public class Sort {
         if (t>=0)System.arraycopy(tmp,0,nums,left,t);
     }
 
-    //快速排序
+    /**
+     * 快速排序
+     * 选取一个基准数，找到这个数在数组中的位置，再对左右分别快排
+     * 时间-O(nlogn)，空间-O(n)，非稳定
+     */
     private static void quickSort(int[] nums){
         quick(nums,0,nums.length-1);
     }
@@ -131,8 +162,13 @@ public class Sort {
         return left;
     }
 
-    //堆排序
+    /**
+     * 堆排序
+     * 构建大顶堆，将堆顶元素与最后一个元素交换，且堆长度减1
+     * 时间-O(nlogn)，空间-O(1)，非稳定
+     */
     private static void heapSort(int[] nums){
+        //堆化除叶子节点外的所有节点
         for (int i=nums.length/2-1; i>=0; i--){
             adjustHeap(nums,i,nums.length-1);
         }
