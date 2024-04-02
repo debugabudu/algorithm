@@ -29,6 +29,7 @@ import java.util.*;
 public class BackTrack {
     /**
      * 给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。
+     * 字符串同样思路
      */
     public List<List<Integer>> permute(int[] nums) {
         List<List<Integer>> res = new ArrayList<>();
@@ -60,6 +61,7 @@ public class BackTrack {
 
     /**
      * 给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。
+     * 字符串同样思路
      */
     public List<List<Integer>> permuteUnique(int[] nums) {
         List<List<Integer>> ans = new ArrayList<>();
@@ -290,5 +292,53 @@ public class BackTrack {
         backtrack(0, n, state, res, cols, diags1, diags2);
 
         return res;
+    }
+
+    /**
+     * 编写一种方法，返回某集合的所有子集。集合中不包含重复的元素。
+     */
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        List<Integer> ans = new ArrayList<>();
+        backTrack(res, ans, nums, 0);
+        return res;
+    }
+
+    public void backTrack(List<List<Integer>> res, List<Integer> ans, int[] nums, int index){
+        if (index >= nums.length){
+            res.add(new ArrayList<>(ans));
+            return;
+        }
+        ans.add(nums[index]);
+        backTrack(res, ans, nums, index+1);
+        ans.remove(ans.size()-1);
+        backTrack(res, ans, nums, index+1);
+    }
+
+    /**
+     * 设计一种算法，打印n对括号的所有合法的（例如，开闭一一对应）组合
+     */
+    public List<String> generateParenthesis(int n) {
+        List<String> res = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        backTrack(res, n, sb, 0, 0);
+        return res;
+    }
+
+    public void backTrack(List<String> res, int n, StringBuilder sb, int l, int r){
+        if (sb.length() == 2*n && l == r){
+            res.add(sb.toString());
+            return;
+        }
+        if (l < n){
+            sb.append('(');
+            backTrack(res, n, sb, l+1, r);
+            sb.deleteCharAt(sb.length()-1);
+        }
+        if (r < l){
+            sb.append(')');
+            backTrack(res, n, sb, l, r+1);
+            sb.deleteCharAt(sb.length()-1);
+        }
     }
 }

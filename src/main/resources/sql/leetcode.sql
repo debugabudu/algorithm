@@ -1,130 +1,168 @@
---查询不订购的客户
-select customers.name as customers
-from customers
-where customers.id not in(
-    select customerId from orders
+-- select (distinct) 列名
+-- from 表名
+-- where 选择条件（比较运算，逻辑运算，in、like、between-and、is null）
+-- group by 分组标志
+-- having 针对分组的选择条件
+-- order by 排序规则
+
+-- 1.进店却未进行交易的顾客
+-- Visits-visit_id和customer_id，Transactions-transaction_id、visit_id和amount
+-- 给出顾客id和只光顾不交易的次数，任意顺序返回
+select v.customer_id as customer_id, count(v.customer_id) as count_no_trans
+from Visits v left join Transactions t
+                        on v.visit_id = t.visit_id
+where transaction_id is null
+group by customer_id
+
+-- 2.找出比前一天温度更高的所有日期id，任意顺序返回
+-- Weather-id、recordDate、temperature
+select w1.id as id
+from Weather w1 join Weather w2
+on DATEDIFF(w1.recordDate, w2.recordDate) = 1 and w1.temperature > w2.temperature
+
+-- 3.计算每个机器的平均运行时间（保留三位小数）
+-- Activity-machine_id、process_id、activity_type(start/end)、timestamp
+select a1.machine_id as machine_id, round(avg(a1.timestamp - a2.timestamp), 3) as processing_time
+from Activity a1, Activity a2
+where a1.machine_id = a2.machine_id
+  and a1.process_id = a2.process_id
+  and a1.activity_type = 'end'
+  and a2.activity_type = 'start'
+group by machine_id
+
+-- 4.学生们参加各科考试的次数
+-- Students-id、mame，Subjects-name，Examinations-stu_id、sub_name
+SELECT
+    s.student_id, s.student_name, sub.subject_name, IFNULL(grouped.attended_exams, 0) AS attended_exams
+FROM
+    Students s
+        CROSS JOIN
+    Subjects sub
+        LEFT JOIN (
+        SELECT student_id, subject_name, COUNT(*) AS attended_exams
+        FROM Examinations
+        GROUP BY student_id, subject_name
+    ) grouped
+        ON s.student_id = grouped.student_id AND sub.subject_name = grouped.subject_name
+ORDER BY s.student_id, sub.subject_name;
+
+-- 5.计算每个用户的确认率，保留2位小数
+-- Signups-user_id、time，Confirmations-user_id、time、action（confirmed、timeout）
+SELECT
+    s.user_id,
+    ROUND(IFNULL(AVG(c.action='confirmed'), 0), 2) AS confirmation_rate
+FROM
+    Signups AS s
+        LEFT JOIN
+    Confirmations AS c
+    ON
+        s.user_id = c.user_id
+GROUP BY
+    s.user_id
+
+-- 6.计算产品的平均售价（保留2位小数）
+-- Prices-product_id、start、end、price，UnitsSold-product_id、date、units
+SELECT
+    product_id,
+    IFNULL(Round(SUM(sales) / SUM(units), 2), 0) AS average_price
+FROM (
+         SELECT
+             Prices.product_id AS product_id,
+             Prices.price * UnitsSold.units AS sales,
+             UnitsSold.units AS units
+         FROM Prices
+                  LEFT JOIN UnitsSold ON Prices.product_id = UnitsSold.product_id
+             AND (UnitsSold.purchase_date BETWEEN Prices.start_date AND Prices.end_date)
+     ) T
+GROUP BY product_id
+
+-- 7.计算每个月、每个国家的事务总数、已批准事务数和总金额
+-- Transactions-id、country、state（approved、declined）、amount、date
+SELECT DATE_FORMAT(trans_date, '%Y-%m') AS month,
+    country,
+    COUNT(*) AS trans_count,
+    COUNT(IF(state = 'approved', 1, NULL)) AS approved_count,
+    SUM(amount) AS trans_total_amount,
+    SUM(IF(state = 'approved', amount, 0)) AS approved_total_amount
+FROM Transactions
+GROUP BY month, country
+
+-- 8.计算即时订单（下单和预期送达日期相同）在客户首次订单中的比例，保留2位小数
+-- Delivery-delivery_id、customer_id、order_date、pref_date
+select round (
+               sum(order_date = customer_pref_delivery_date) * 100 /
+               count(*),
+               2
+       ) as immediate_percentage
+from Delivery
+where (customer_id, order_date) in (
+    select customer_id, min(order_date)
+    from delivery
+    group by customer_id
 )
 
---查询referee_id不为2的客户
-select name from customer where referee_id<>2 or referee_id is null
+-- 9.查询所有的经理id、名称、直接向其汇报的员工人数和平均年龄（年龄四舍五入到整数）
+-- Employees-id、name、report_to、age
+select m.employee_id, m.name,
+       count(*) as reports_count,
+       round(avg(e.age),0) as average_age
+from Employees e
+         join Employees m
+              on e.reports_to = m.employee_id
+group by m.employee_id
+order by employee_id
 
---筛选id为奇数且名字开头不为M的员工,计算其奖金为月薪,否则为0
-select
-    employee_id,
-    case
-        when employee_id % 2 = 1 and left(name, 1) <> 'M' then salary
-        else 0
-end as bonus
-from Employees
-order by employee_id asc;
+-- 10.查询指定日期的产品价格（第一次修改之前都是10）
+-- Products-product_id、new_price、change_date
+select p1.product_id, ifnull(p2.new_price, 10) as price
+from (
+         select distinct product_id
+         from products
+     ) as p1 -- 所有的产品
+         left join (
+    select product_id, new_price
+    from products
+    where (product_id, change_date) in (
+        select product_id, max(change_date)
+        from products
+        where change_date <= '2019-08-16'
+        group by product_id
+    )
+) as p2 -- 在 2019-08-16 之前有过修改的产品和最新的价格
+        on p1.product_id = p2.product_id
 
---交换性别(使用update且不产生中间表)
-UPDATE salary
-SET
-    sex = CASE sex
-              WHEN 'm' THEN 'f'
-              ELSE 'm'
-        END;
+-- 11.按顺序上巴士，巴士有1000kg的重量限制，找出最后一个可以上bus的人
+-- Queue-person_id、person_name、weight、turn
+SELECT a.person_name
+FROM Queue a, Queue b
+WHERE a.turn >= b.turn
+GROUP BY a.person_id HAVING SUM(b.weight) <= 1000
+ORDER BY a.turn DESC LIMIT 1
 
---将表中的姓名全部变为第一个字母大些,其余小写
-SELECT user_id, CONCAT(UPPER(LEFT(name, 1)), LOWER(SUBSTRING(name, 2))) AS name
-FROM Users
-ORDER BY user_id
+-- 12.以7天（从第七天开始）为一个时间段的顾客消费平均值（开窗函数）
+-- Customers-customer_id、name、visited_on、amount
+SELECT DISTINCT visited_on,
+                sum_amount AS amount,
+                ROUND(sum_amount/7, 2) AS average_amount
+FROM (
+         SELECT visited_on, SUM(amount) OVER ( ORDER BY visited_on RANGE interval 6 day preceding  ) AS sum_amount
+         FROM Customer) t
+WHERE DATEDIFF(visited_on, (SELECT MIN(visited_on) FROM Customer)) >= 6
 
---按日期统计销售的商品
-select
-    sell_date,
-    count(distinct product) as num_sold,
-    group_concat(distinct product order by product asc) as products
+-- 13.找出每个部门工资前三高的所有员工（可能有并列）
+-- Employee-id、name、salary、departmentId，Department-id、name
+select department.name as Department, employee.name as Employee, employee.salary as Salary
+from employee,
+     department,
+     (select employee.id, dense_rank() over (PARTITION BY employee.departmentId order by salary desc) dr
+      from employee) t
+where employee.departmentId = department.id
+  and t.dr <= 3
+  and employee.id = t.id;
+
+-- 14.查询每个日期销售的产品数量和产品详情
+-- Activities-sell_date、product
+select sell_date, count(distinct product) as num_sold, group_concat(distinct product order by product asc) as products
 from Activities
 group by sell_date
-order by sell_date asc;
-
---查询第二高的工资
-SELECT
-    (SELECT DISTINCT
-         Salary
-     FROM
-         Employee
-     ORDER BY Salary DESC
-        LIMIT 1 OFFSET 1) AS SecondHighestSalary;
-
---销售人员表/公司表/订单表,查询未与red公司有交集的销售人员
-select s.name from salesperson s
-where s.sales_id not in (
-    select o.sales_id from orders o left join company c on o.com_id=c.com_id where c.name='RED'
-    )
-
---order by 对多列排序的时候，先排序的列放前面，后排序的列放后面。并且，不同的列可以有不同的排序规则。
-
---返回每个订单号（order_num）各有多少行数（order_lines），并按 order_lines 对结果进行升序排序。
-select order_num, count(order_num) as order_lines
-from OrderItems
-group by order_num
-order by order_lines;
-
---返回订单数量总和不小于 100 的所有订单号，最后结果按照订单号升序排序。
---直接聚合
-select order_num
-from OrderItems
-group by order_num
-having sum(quantity) >= 100
-order by order_num;
---子查询
-select order_num
-from (select order_num, sum(quantity) as sum_num
-      from OrderItems group by order_num having sum_num >= 100
-     ) a
-order by order_num;
-
---使用子查询来确定哪些订单（在 OrderItems 中）购买了 prod_id 为 "BR01" 的产品，
--- 然后从 Orders 表中返回每个产品对应的顾客 ID（cust_id）和订单日期（order_date），按订购日期对结果进行升序排序。
---写法 1：子查询
-select cust_id, order_date
-from Orders
-where order_num in (
-    select order_num
-    from OrderItems
-    where prod_id = 'BR01'
-)
-order by order_date;
---写法 2: 连接表
-select
-    b.cust_id, b.order_date
-from
-    OrderItems a, Orders b
-where
-    a.order_num = b.order_num
-    and a.prod_id = 'BR01'
-order by
-    order_date;
-
---返回购买 prod_id 为 BR01 的产品的所有顾客的电子邮件（Customers 表中的 cust_email），结果无需排序。
---写法 1：子查询
-select cust_email
-from Customers
-where cust_id in (
-    select cust_id
-    from Orders
-    where order_num in (
-        select order_num
-        from OrderItems
-        where prod_id = 'BR01'
-    )
-);
---写法 2: 连接表（inner join）
-select c.cust_email
-from OrderItems a, Orders b, Customers c
-where a.order_num = b.order_num
-  and b.cust_id = c.cust_id
-  and a.prod_id = 'BR01';
---写法 3：连接表（left join）
-select
-    c.cust_email
-from
-    Orders a
-    left join OrderItems b on a.order_num = b.order_num
-    left join Customers c on a.cust_id = c.cust_id
-where
-    b.prod_id = 'BR01';
-
+order by sell_date asc

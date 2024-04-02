@@ -4,8 +4,8 @@ package com.yliu.structure.advance;
  * 前缀树
  */
 public class Trie {
-    Trie[] children;
-    boolean isEnd;
+    public Trie[] children;
+    public boolean isEnd;
 
     public Trie() {
         children = new Trie[26];

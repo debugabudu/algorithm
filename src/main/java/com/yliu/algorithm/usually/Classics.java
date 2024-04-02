@@ -6,8 +6,7 @@ import java.util.*;
 
 /**
  * 经典题目
- * 前缀和，单调栈
- * 堆/优先队列
+ * 前缀和
  * 位运算：x^x=0  x&1判断奇偶 x&(x-1)清零最低位的1 x&-x得到最低位的1
  */
 public class Classics {
@@ -306,26 +305,6 @@ public class Classics {
     }
 
     /**
-     * 请根据每日 气温 列表 temperatures，重新生成一个列表，要求其对应位置的输出为：要想观测到更高的气温，至少需要等待的天数。
-     * 如果气温在这之后都不会升高，请在该位置用0 来代替。
-     * 单调栈
-     */
-    public int[] dailyTemperatures(int[] temperatures) {
-        int length = temperatures.length;
-        int[] ans = new int[length];
-        Deque<Integer> stack = new LinkedList<>();
-        for (int i = 0; i < length; i++) {
-            int temperature = temperatures[i];
-            while (!stack.isEmpty() && temperature > temperatures[stack.peek()]) {
-                int prevIndex = stack.pop();
-                ans[prevIndex] = i - prevIndex;
-            }
-            stack.push(i);
-        }
-        return ans;
-    }
-
-    /**
      * 假设有打乱顺序的一群人站成一个队列，数组 people 表示队列中一些人的属性（不一定按顺序）。
      * 每个 people[i] = [hi, ki] 表示第 i 个人的身高为 hi ，前面 正好 有 ki 个身高大于或等于 hi 的人。
      * 请你重新构造并返回输入数组people 所表示的队列。
@@ -345,5 +324,52 @@ public class Classics {
         }
 
         return que.toArray(new int[people.length][]);
+    }
+
+    /**
+     * 每年，政府都会公布一万个最常见的婴儿名字和它们出现的频率，也就是同名婴儿的数量。
+     * 有些名字有多种拼法，例如，John 和 Jon 本质上是相同的名字，但被当成了两个名字公布出来。
+     * 给定两个列表，一个是名字及对应的频率，另一个是本质相同的名字对。设计一个算法打印出每个真实名字的实际频率。
+     * 注意，如果 John 和 Jon 是相同的，并且 Jon 和 Johnny 相同，则 John 与 Johnny 也相同，即它们有传递和对称性。
+     * 在结果列表中，选择 字典序最小 的名字作为真实名字。
+     */
+    public String[] trulyMostPopular(String[] names, String[] synonyms) {
+        Map<String, Integer> map = new HashMap<>();
+        Map<String, String> unionMap = new HashMap<>();     //并查集， key(子孙)->value(祖宗)
+        for (String name : names) {     //统计频率
+            int idx1 = name.indexOf('(');
+            int idx2 = name.indexOf(')');
+            int frequency = Integer.parseInt(name.substring(idx1 + 1, idx2));
+            map.put(name.substring(0, idx1), frequency);
+        }
+        for (String pair : synonyms) {  //union同义词
+            int idx = pair.indexOf(',');
+            String name1 = pair.substring(1, idx);
+            String name2 = pair.substring(idx + 1, pair.length() - 1);
+            while (unionMap.containsKey(name1)) {   //找name1祖宗
+                name1 = unionMap.get(name1);
+            }
+            while (unionMap.containsKey(name2)) {   //找name2祖宗
+                name2 = unionMap.get(name2);
+            }
+            if(!name1.equals(name2)){   //祖宗不同，要合并
+                //出现次数是两者之和
+                int frequency = map.getOrDefault(name1, 0) + map.getOrDefault(name2, 0);
+                String trulyName = name1.compareTo(name2) < 0 ? name1 : name2;
+                String nickName = name1.compareTo(name2) < 0 ? name2 : name1;
+                unionMap.put(nickName, trulyName);      //小名作为大名的分支，即大名是小名的祖宗
+                map.remove(nickName);       //更新一下数据
+                map.put(trulyName, frequency);
+            }
+        }
+        String[] res = new String[map.size()];
+        int index = 0;
+        for (String name : map.keySet()) {
+            String sb = name + '(' +
+                    map.get(name) +
+                    ')';
+            res[index++] = sb;
+        }
+        return res;
     }
 }

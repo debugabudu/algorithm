@@ -1,6 +1,7 @@
 package com.yliu.algorithm.custom;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -143,6 +144,36 @@ public class Dynamic {
             f[i][2] = Math.max(f[i - 1][1], f[i - 1][2]);
         }
         return Math.max(f[n - 1][1], f[n - 1][2]);
+    }
+
+    /**
+     * 给你一个整数数组 prices 和一个整数 k ，其中 prices[i] 是某支给定的股票在第 i 天的价格。
+     * 设计一个算法来计算你所能获取的最大利润。你最多可以完成 k 笔交易。也就是说，你最多可以买 k 次，卖 k 次。
+     * 注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+     */
+    public int maxProfit2(int k, int[] prices) {
+        if(prices.length == 0){
+            return 0;
+        }
+        if(k == 0){
+            return 0;
+        }
+        // 这里记录k次交易的状态就行了
+        // 每次交易都有买入，卖出两个状态，所以要乘 2
+        int[] dp = new int[2 * k];
+        for(int i = 0; i < dp.length / 2; i++){
+            dp[i * 2] = -prices[0];
+        }
+        for(int i = 1; i <= prices.length; i++){
+            dp[0] = Math.max(dp[0], -prices[i - 1]);
+            dp[1] = Math.max(dp[1], dp[0] + prices[i - 1]);
+            for(int j = 2; j < dp.length; j += 2){
+                dp[j] = Math.max(dp[j], dp[j - 1] - prices[i-1]);
+                dp[j + 1] = Math.max(dp[j + 1], dp[j] + prices[i - 1]);
+            }
+        }
+        // 返回最后一次交易卖出状态的结果
+        return dp[dp.length - 1];
     }
 
     /**
@@ -301,5 +332,113 @@ public class Dynamic {
             }
         }
         return dp[0][n - 1];
+    }
+
+    /**
+     * 无重叠区间
+     * 给定一个区间的集合 intervals ，其中 intervals[i] = [starti, endi] 。返回 需要移除区间的最小数量，使剩余区间互不重叠 。
+     */
+    public int eraseOverlapIntervals(int[][] intervals) {
+        if (intervals.length == 0) {
+            return 0;
+        }
+
+        Arrays.sort(intervals, Comparator.comparingInt(interval -> interval[0]));
+
+        int n = intervals.length;
+        int[] f = new int[n];
+        Arrays.fill(f, 1);
+        for (int i = 1; i < n; ++i) {
+            for (int j = 0; j < i; ++j) {
+                if (intervals[j][1] <= intervals[i][0]) {
+                    f[i] = Math.max(f[i], f[j] + 1);
+                }
+            }
+        }
+        return n - Arrays.stream(f).max().getAsInt();
+    }
+
+    /**
+     * 给定一个长度为 n 的环形整数数组 nums ，返回 nums 的非空 子数组 的最大可能和 。
+     * 环形数组 意味着数组的末端将会与开头相连呈环状。形式上，
+     * nums[i] 的下一个元素是 nums[(i + 1) % n] ， nums[i] 的前一个元素是 nums[(i - 1 + n) % n] 。
+     * 子数组 最多只能包含固定缓冲区 nums 中的每个元素一次。形式上，对于子数组 nums[i], nums[i + 1], ..., nums[j] ，
+     * 不存在 i <= k1, k2 <= j 其中 k1 % n == k2 % n 。
+     */
+    public int maxSubarraySumCircular(int[] nums) {
+        int n = nums.length;
+        int[] leftMax = new int[n];
+        // 对坐标为 0 处的元素单独处理，避免考虑子数组为空的情况
+        leftMax[0] = nums[0];
+        int leftSum = nums[0];
+        int pre = nums[0];
+        int res = nums[0];
+        for (int i = 1; i < n; i++) {
+            pre = Math.max(pre + nums[i], nums[i]);
+            res = Math.max(res, pre);
+            leftSum += nums[i];
+            leftMax[i] = Math.max(leftMax[i - 1], leftSum);
+        }
+
+        // 从右到左枚举后缀，固定后缀，选择最大前缀
+        int rightSum = 0;
+        for (int i = n - 1; i > 0; i--) {
+            rightSum += nums[i];
+            res = Math.max(res, rightSum + leftMax[i - 1]);
+        }
+        return res;
+    }
+
+    /**
+     * 堆箱子。给你一堆n个箱子，箱子宽 wi、深 di、高 hi。箱子不能翻转，将箱子堆起来时，下面箱子的宽度、高度和深度必须大于上面的箱子。
+     * 实现一种方法，搭出最高的一堆箱子。箱堆的高度为每个箱子高度的总和。
+     */
+    public int pileBox(int[][] box) {
+        Arrays.sort(box, Comparator.comparingInt(x -> x[0]));
+        int[] dp = new int[box.length];
+        int res = 0;
+        for(int i = 0; i < box.length; ++i){
+            for(int j = 0; j < i; ++j){
+                // i 的三维都要比 j 大
+                if(box[i][0] > box[j][0] && box[i][1] > box[j][1] && box[i][2] > box[j][2]){
+                    //在 0 <= j < i 范围内找到最大的 dp[j]
+                    dp[i] = Math.max(dp[i], dp[j]);
+                }
+            }
+            //最后加上最底端箱子的高度
+            dp[i] += box[i][2];
+            res = Math.max(dp[i], res);
+        }
+        return res;
+    }
+
+    /**
+     * 给定一个方阵，其中每个单元(像素)非黑即白。设计一个算法，找出 4 条边皆为黑色像素的最大子方阵。
+     * 返回一个数组 [r, c, size] ，其中 r, c 分别代表子方阵左上角的行号和列号，size 是子方阵的边长。
+     * 若有多个满足条件的子方阵，返回 r 最小的，若 r 相同，返回 c 最小的子方阵。若无满足条件的子方阵，返回空数组。
+     */
+    public int[] findSquare(int[][] matrix) {
+        int n = matrix.length;
+        int[][] left = new int[n + 1][n + 1];
+        int[][] up = new int[n + 1][n + 1];
+        int r = 0, c = 0, size = 0;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (matrix[i - 1][j - 1] == 0) {
+                    left[i][j] = left[i][j - 1] + 1;
+                    up[i][j] = up[i - 1][j] + 1;
+                    int border = Math.min(left[i][j], up[i][j]);
+                    while (left[i - border + 1][j] < border || up[i][j - border + 1] < border) {
+                        border--;
+                    }
+                    if (border > size) {
+                        r = i - border;
+                        c = j - border;
+                        size = border;
+                    }
+                }
+            }
+        }
+        return size > 0 ? new int[]{r, c, size} : new int[0];
     }
 }

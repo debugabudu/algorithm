@@ -1,5 +1,7 @@
 package com.yliu.algorithm.custom;
 
+import java.util.Arrays;
+
 /**
  * 区间表示：
  * [l,r],l<=r,l=m+1,r=m-1
@@ -134,5 +136,54 @@ public class BinarySearch {
             }
         }
         return -1;
+    }
+
+    /**
+     * 有个马戏团正在设计叠罗汉的表演节目，一个人要站在另一人的肩膀上。出于实际和美观的考虑，在上面的人要比下面的人矮一点且轻一点。
+     * 已知马戏团每个人的身高和体重，请编写代码计算叠罗汉最多能叠几个人。
+     */
+    public int bestSeqAtIndex(int[] height, int[] weight) {
+        int len = height.length;
+        int[][] arr = new int[len][2];
+        for(int i = 0; i < len; i++){
+            arr[i][0] = height[i];
+            arr[i][1] = weight[i];
+        }
+
+        Arrays.sort(arr, (o1, o2) -> {
+            if(o1[0] == o2[0]){
+                return Integer.compare(o1[1], o2[1]);
+            }
+            return Integer.compare(o2[0], o1[0]);
+        });
+
+        int[][] dp = new int[len + 1][2];
+        dp[1] = arr[0];
+        int index = 1;
+        for(int i = 1; i < len; i++){
+            if(arr[i][1] < dp[index][1]){
+                dp[++index] = arr[i];
+            } else {
+                int pos = find(dp, arr[i], index);
+                dp[pos] = arr[i];
+            }
+        }
+
+        return index;
+    }
+
+    public int find(int[][] dp, int[] person, int index){
+        int left = 1;
+        int right = index;
+        while(left < right){
+            int mid = (left + right) / 2;
+            if(dp[mid][1] <= person[1]){
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+
+        return right;
     }
 }

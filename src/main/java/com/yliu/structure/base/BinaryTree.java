@@ -4,6 +4,7 @@ import java.util.*;
 
 /**
  * 二叉树的遍历和重建、二叉搜索树插入删除节点
+ * 深度优先搜索-递归/栈、广度优先-队列
  */
 public class BinaryTree {
     static class TreeNode {
@@ -148,31 +149,6 @@ public class BinaryTree {
         node.left = helper1(endPost-inEnd+index-1,inStart,index-1,inOrder,postOrder);
         node.right = helper1(endPost-1,index+1,inEnd,inOrder,postOrder);
         return node;
-    }
-
-    /**
-     * 给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
-     * 叶子节点 是指没有子节点的节点。
-     */
-    List<List<Integer>> pathSum(TreeNode root, int target) {
-        List<List<Integer>> ret = new LinkedList<>();
-        Deque<Integer> path = new LinkedList<>();
-        dfs(root, target, ret, path);
-        return ret;
-    }
-
-    void dfs(TreeNode root, int target, List<List<Integer>> ret, Deque<Integer> path) {
-        if (root == null) {
-            return;
-        }
-        path.offerLast(root.value);
-        target -= root.value;
-        if (root.left == null && root.right == null && target == 0) {
-            ret.add(new LinkedList<>(path));
-        }
-        dfs(root.left, target, ret, path);
-        dfs(root.right, target, ret, path);
-        path.pollLast();
     }
 
     /**
