@@ -131,7 +131,7 @@ public class Sort {
     /**
      * 快速排序
      * 选取一个基准数，找到这个数在数组中的位置，再对左右分别快排
-     * 时间-O(nlogn)，空间-O(n)，非稳定
+     * 时间-O(nlogn)，空间-O(logn)，非稳定
      */
     private static void quickSort(int[] nums){
         quick(nums,0,nums.length-1);
