@@ -1,10 +1,10 @@
-package com.yliu.algorithm.design;
+package com.yliu.structure.advance;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class LRUCache {
-    class DLinkedNode {
+    static class DLinkedNode {
         int key;
         int value;
         DLinkedNode prev;

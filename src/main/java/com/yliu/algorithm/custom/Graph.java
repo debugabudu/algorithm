@@ -1,9 +1,10 @@
-package com.yliu.algorithm.usually;
+package com.yliu.algorithm.custom;
 
 import java.util.*;
 
 /**
  * 深度优先搜索和广度优先搜索
+ * 拓扑排序（针对有向无环图，在有依赖关系的情况下，进行排序）
  */
 public class Graph {
     /**
@@ -480,7 +481,6 @@ public class Graph {
      * 还提供了一个 2D 整数数组sequences，其中sequences[i]是nums的子序列。
      * 检查 nums 是否是唯一的最短超序列 。最短 超序列 是 长度最短 的序列，并且所有序列sequences[i]都是它的子序列。
      * 对于给定的数组sequences，可能存在多个有效的 超序列 。
-     *
      * 例如，对于sequences = [[1,2],[1,3]]，有两个最短的 超序列 ，[1,2,3] 和 [1,3,2] 。
      * 而对于sequences = [[1,2],[1,3],[1,2,3]]，唯一可能的最短 超序列 是 [1,2,3] 。[1,2,3,4] 是可能的超序列，但不是最短的。
      * 如果 nums 是序列的唯一最短 超序列 ，则返回 true ，否则返回 false 。

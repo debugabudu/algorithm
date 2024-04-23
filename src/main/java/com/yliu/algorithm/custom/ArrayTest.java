@@ -1,17 +1,16 @@
-package com.yliu.algorithm.usually;
-
-import com.yliu.structure.advance.Trie;
+package com.yliu.algorithm.custom;
 
 import java.util.*;
 
 /**
  * 字符串和数组相关问题
  */
-public class ArrayAndString {
+public class ArrayTest {
+
     /**
      * 给你一个整数数组 nums，返回 数组 answer ，其中 answer[i] 等于 nums 中除 nums[i] 之外其余各元素的乘积 。
-     * 题目数据 保证 数组 nums之中任意元素的全部前缀元素和后缀的乘积都在  32 位 整数范围内。
-     * 请 不要使用除法，且在 O(n) 时间复杂度内完成此题。
+     * 题目数据保证数组 nums 之中任意元素的全部前缀元素和后缀的乘积都在 32 位 整数范围内。
+     * 请不要使用除法，且在 O(n) 时间复杂度内完成此题。
      */
     public int[] productExceptSelf(int[] nums) {
         int length = nums.length;
@@ -64,47 +63,6 @@ public class ArrayAndString {
     }
 
     /**
-     * 给你一个字符数组 chars ，请使用下述算法压缩：
-     * 从一个空字符串 s 开始。对于 chars 中的每组 连续重复字符 ：
-     * 如果这一组长度为 1 ，则将字符追加到 s 中。
-     * 否则，需要向 s 追加字符，后跟这一组的长度。
-     * 压缩后得到的字符串 s 不应该直接返回 ，需要转储到字符数组 chars 中。
-     * 需要注意的是，如果组长度为 10 或 10 以上，则在 chars 数组中会被拆分为多个字符。
-     * 请在 修改完输入数组后 ，返回该数组的新长度。
-     * 你必须设计并实现一个只使用常量额外空间的算法来解决此问题。
-     */
-    public int compress(char[] chars) {
-        int n = chars.length;
-        int write = 0, left = 0;
-        for (int read = 0; read < n; read++) {
-            if (read == n - 1 || chars[read] != chars[read + 1]) {
-                chars[write++] = chars[read];
-                int num = read - left + 1;
-                if (num > 1) {
-                    int anchor = write;
-                    while (num > 0) {
-                        chars[write++] = (char) (num % 10 + '0');
-                        num /= 10;
-                    }
-                    reverse(chars, anchor, write - 1);
-                }
-                left = read + 1;
-            }
-        }
-        return write;
-    }
-
-    public void reverse(char[] chars, int left, int right) {
-        while (left < right) {
-            char temp = chars[left];
-            chars[left] = chars[right];
-            chars[right] = temp;
-            left++;
-            right--;
-        }
-    }
-
-    /**
      * 给你两个下标从 0 开始的整数数组 nums1 和 nums2 ，两者长度都是 n ，再给你一个正整数 k 。
      * 你必须从 nums1 中选一个长度为 k 的 子序列 对应的下标。
      * 对于选择的下标 i0 ，i1 ，...， ik - 1 ，你的 分数 定义如下：
@@ -120,7 +78,7 @@ public class ArrayAndString {
             ids[i] = i;
         }
         // 对下标排序，不影响原数组的顺序
-        Arrays.sort(ids, (i, j) -> nums2[j] - nums2[i]);
+        java.util.Arrays.sort(ids, (i, j) -> nums2[j] - nums2[i]);
 
         PriorityQueue<Integer> pq = new PriorityQueue<>();
         long sum = 0;
@@ -201,40 +159,105 @@ public class ArrayAndString {
     }
 
     /**
-     * 哦，不！你不小心把一个长篇文章中的空格、标点都删掉了，并且大写也弄成了小写。
-     * 像句子"I reset the computer. It still didn’t boot!"已经变成了"iresetthecomputeritstilldidntboot"。
-     * 在处理标点符号和大小写之前，你得先把它断成词语。当然了，你有一本厚厚的词典dictionary，不过，有些词没在词典里。
-     * 假设文章用sentence表示，设计一个算法，把文章断开，要求未识别的字符最少，返回未识别的字符数。
+     * 给你一个包含 n 个整数的数组nums，判断nums中是否存在三个元素 a，b，c ，使得a + b + c = 0 ？请你找出所有和为 0 且不重复的三元组。
      */
-    public int replace(String[] dictionary, String sentence) {
-        int n = sentence.length();
-
-        Trie root = new Trie();
-        for (String word: dictionary) {
-            root.insert(word);
-        }
-
-        int[] dp = new int[n + 1];
-        Arrays.fill(dp, Integer.MAX_VALUE);
-        dp[0] = 0;
-        for (int i = 1; i <= n; ++i) {
-            dp[i] = dp[i - 1] + 1;
-
-            Trie curPos = root;
-            for (int j = i; j >= 1; --j) {
-                int t = sentence.charAt(j - 1) - 'a';
-                if (curPos.children[t] == null) {
-                    break;
-                } else if (curPos.children[t].isEnd) {
-                    dp[i] = Math.min(dp[i], dp[j - 1]);
+    public List<List<Integer>> threeSum(int[] nums) {
+        int n = nums.length;
+        java.util.Arrays.sort(nums);
+        List<List<Integer>> ans = new ArrayList<>();
+        // 枚举 a
+        for (int first = 0; first < n; ++first) {
+            // 需要和上一次枚举的数不相同
+            if (first > 0 && nums[first] == nums[first - 1]) {
+                continue;
+            }
+            // c 对应的指针初始指向数组的最右端
+            int third = n - 1;
+            int target = -nums[first];
+            // 枚举 b
+            for (int second = first + 1; second < n; ++second) {
+                // 需要和上一次枚举的数不相同
+                if (second > first + 1 && nums[second] == nums[second - 1]) {
+                    continue;
                 }
-                if (dp[i] == 0) {
+                // 需要保证 b 的指针在 c 的指针的左侧
+                while (second < third && nums[second] + nums[third] > target) {
+                    --third;
+                }
+                // 如果指针重合，随着 b 后续的增加
+                // 就不会有满足 a+b+c=0 并且 b<c 的 c 了，可以退出循环
+                if (second == third) {
                     break;
                 }
-                curPos = curPos.children[t];
+                if (nums[second] + nums[third] == target) {
+                    List<Integer> list = new ArrayList<>();
+                    list.add(nums[first]);
+                    list.add(nums[second]);
+                    list.add(nums[third]);
+                    ans.add(list);
+                }
             }
         }
-        return dp[n];
+        return ans;
+    }
+
+    /**
+     * 给你一个由 n 个整数组成的数组nums ，和一个目标值 target 。
+     * 请你找出并返回满足下述全部条件且不重复的四元组[nums[a], nums[b], nums[c], nums[d]]
+     * （若两个四元组元素一一对应，则认为两个四元组重复）：
+     * 0 <= a, b, c, d< n
+     * a、b、c 和 d 互不相同
+     * nums[a] + nums[b] + nums[c] + nums[d] == target
+     */
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        List<List<Integer>> quadruplets = new ArrayList<>();
+        if (nums == null || nums.length < 4) {
+            return quadruplets;
+        }
+        java.util.Arrays.sort(nums);
+        int length = nums.length;
+        for (int i = 0; i < length - 3; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            if ((long) nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3] > target) {
+                break;
+            }
+            if ((long) nums[i] + nums[length - 3] + nums[length - 2] + nums[length - 1] < target) {
+                continue;
+            }
+            for (int j = i + 1; j < length - 2; j++) {
+                if (j > i + 1 && nums[j] == nums[j - 1]) {
+                    continue;
+                }
+                if ((long) nums[i] + nums[j] + nums[j + 1] + nums[j + 2] > target) {
+                    break;
+                }
+                if ((long) nums[i] + nums[j] + nums[length - 2] + nums[length - 1] < target) {
+                    continue;
+                }
+                int left = j + 1, right = length - 1;
+                while (left < right) {
+                    int sum = nums[i] + nums[j] + nums[left] + nums[right];
+                    if (sum == target) {
+                        quadruplets.add(java.util.Arrays.asList(nums[i], nums[j], nums[left], nums[right]));
+                        while (left < right && nums[left] == nums[left + 1]) {
+                            left++;
+                        }
+                        left++;
+                        while (left < right && nums[right] == nums[right - 1]) {
+                            right--;
+                        }
+                        right--;
+                    } else if (sum < target) {
+                        left++;
+                    } else {
+                        right--;
+                    }
+                }
+            }
+        }
+        return quadruplets;
     }
 
     /**
@@ -279,70 +302,71 @@ public class ArrayAndString {
     }
 
     /**
-     * 给定字典中的两个词，长度相等。写一个方法，把一个词转换成另一个词， 但是一次只能改变一个字符。每一步得到的新词都必须能在字典中找到。
-     * 编写一个程序，返回一个可能的转换序列。如有多个可能的转换序列，你可以返回任何一个。
+     * 给你一个非负整数数组nums ，你最初位于数组的第一个位置。
+     * 数组中的每个元素代表你在该位置可以跳跃的最大长度。
+     * 你的目标是使用最少的跳跃次数到达数组的最后一个位置。
+     * 假设你总是可以到达数组的最后一个位置。
      */
-    public List<String> findLadders(String beginWord, String endWord, List<String> wordList) {
-        //定义BFS的队列
-        Queue<String> queue = new LinkedList<>();
-        //ans存放答案
-        List<String> ans = new LinkedList<>();
-        //标记是否被访问过
-        boolean[] visited = new boolean[wordList.size()];
-        //存放每个单词的前驱，比如hot的前驱可以是hit,lot等；
-        HashMap<String,String> map = new HashMap<>();
-        //初步判断
-        if(!wordList.contains(endWord)){
-            return ans;
-        }
-        //将第一个单词加入队列
-        queue.add(beginWord);
-        boolean flag = false;
-        //BFS主要操作
-        while(!queue.isEmpty()){
-            //先将头取出
-            String queueHead = queue.poll();
-            //如果队列头元素等于end word，代表已经找到，break同时设置flag = true;
-            if(queueHead.equals(endWord)){
-                flag = true;
-                break;
-            }
-            //寻找可能的元素加入队列，并且设置对应的前驱。
-            for(int i = 0;i < wordList.size();i ++){
-                //如果未被访问过并且可以直接转换，则加入队列，compare()函数用来判断是否可以转换。
-                if(!visited[i] && compare(wordList.get(i), queueHead)){
-                    queue.add(wordList.get(i));
-                    visited[i] = true;
-                    //存储前驱
-                    map.put(wordList.get(i), queueHead);
+    public int jump(int[] nums) {
+        int position = nums.length - 1;
+        int steps = 0;
+        while (position > 0) {
+            for (int i = 0; i < position; i++) {
+                if (i + nums[i] >= position) {
+                    position = i;
+                    steps++;
+                    break;
                 }
             }
         }
-        if(!flag){
-            return ans;
+        return steps;
+    }
+
+    /**
+     * 给定一个二进制数组 nums , 找到含有相同数量的 0 和 1 的最长连续子数组，并返回该子数组的长度。
+     */
+    public int findMaxLength(int[] nums) {
+        int maxLength = 0;
+        Map<Integer, Integer> map = new HashMap<>();
+        int counter = 0;
+        map.put(counter, -1);
+        int n = nums.length;
+        for (int i = 0; i < n; i++) {
+            int num = nums[i];
+            if (num == 1) {
+                counter++;
+            } else {
+                counter--;
+            }
+            if (map.containsKey(counter)) {
+                int prevIndex = map.get(counter);
+                maxLength = Math.max(maxLength, i - prevIndex);
+            } else {
+                map.put(counter, i);
+            }
+        }
+        return maxLength;
+    }
+
+    /**
+     * 假设有打乱顺序的一群人站成一个队列，数组 people 表示队列中一些人的属性（不一定按顺序）。
+     * 每个 people[i] = [hi, ki] 表示第 i 个人的身高为 hi ，前面 正好 有 ki 个身高大于或等于 hi 的人。
+     * 请你重新构造并返回输入数组people 所表示的队列。
+     * 返回的队列应该格式化为数组 queue ，其中 queue[j] = [hj, kj] 是队列中第 j 个人的属性（queue[0] 是排在队列前面的人）。
+     */
+    public int[][] reconstructQueue(int[][] people) {
+        // 身高从大到小排（身高相同k小的站前面）
+        java.util.Arrays.sort(people, (a, b) -> {
+            if (a[0] == b[0]) return a[1] - b[1];
+            return b[0] - a[0];
+        });
+
+        LinkedList<int[]> que = new LinkedList<>();
+
+        for (int[] p : people) {
+            que.add(p[1],p);
         }
 
-        //遍历答案
-        String key = endWord;
-        while(!Objects.equals(map.get(key), beginWord)){
-            ans.add(key);
-            key = map.get(key);
-        }
-        ans.add(key);
-        ans.add(map.get(key));
-        Collections.reverse(ans);
-        return ans;
-    }
-    public static boolean compare(String word1,String word2){
-        int diff = 0;
-        for(int i = 0;i < word1.length();i ++){
-            if(word1.charAt(i) != word2.charAt(i)){
-                diff ++;
-                if(diff >= 2){
-                    return false;
-                }
-            }
-        }
-        return true;
+        return que.toArray(new int[people.length][]);
     }
 }

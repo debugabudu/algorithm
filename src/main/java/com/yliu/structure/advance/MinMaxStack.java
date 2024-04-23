@@ -1,4 +1,4 @@
-package com.yliu.algorithm.design;
+package com.yliu.structure.advance;
 
 import java.util.Stack;
 

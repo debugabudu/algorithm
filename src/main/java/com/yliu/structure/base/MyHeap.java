@@ -1,12 +1,10 @@
 package com.yliu.structure.base;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * 堆，实际直接用PriorityQueue
+ * 使用ArrayList实现，还可使用数组实现
  */
 public class MyHeap {
     List<Integer> heap;
@@ -112,7 +110,7 @@ public class MyHeap {
     /**
      * topk问题，找出数组中前k大的元素，直接排序-O(nlogn)，使用堆-O(nlogk)
      */
-    Queue<Integer> topK(int[] nums, int k){
+    public Queue<Integer> topK(int[] nums, int k){
         Queue<Integer> pq = new PriorityQueue<>();
         for (int i=0; i<k; i++){
             pq.offer(nums[i]);
@@ -124,5 +122,51 @@ public class MyHeap {
             }
         }
         return pq;
+    }
+
+    /**
+     * 我们把只包含质因子 2、3 和 5 的数称作丑数（Ugly Number）。求按从小到大的顺序的第 n 个丑数。
+     */
+    public int nthUglyNumber(int n) {
+        int[] factors = {2, 3, 5};
+        Set<Long> seen = new HashSet<>();
+        PriorityQueue<Long> heap = new PriorityQueue<>();
+        seen.add(1L);
+        heap.offer(1L);
+        int ugly = 0;
+        for (int i = 0; i < n; i++) {
+            long curr = heap.poll();
+            ugly = (int) curr;
+            for (int factor : factors) {
+                long next = curr * factor;
+                if (seen.add(next)) {
+                    heap.offer(next);
+                }
+            }
+        }
+        return ugly;
+    }
+
+    /**
+     * 有一堆石头，每块石头的重量都是正整数。
+     * 每一回合，从中选出两块 最重的 石头，然后将它们一起粉碎。假设石头的重量分别为x 和y，且x <= y。那么粉碎的可能结果如下：
+     * 如果x == y，那么两块石头都会被完全粉碎；
+     * 如果x != y，那么重量为x的石头将会完全粉碎，而重量为y的石头新重量为y-x。
+     * 最后，最多只会剩下一块石头。返回此石头的重量。如果没有石头剩下，就返回 0。
+     */
+    public int lastStoneWeight(int[] stones) {
+        PriorityQueue<Integer> pq = new PriorityQueue<>((a, b) -> b - a);
+        for (int stone : stones) {
+            pq.offer(stone);
+        }
+
+        while (pq.size() > 1) {
+            int a = pq.poll();
+            int b = pq.poll();
+            if (a > b) {
+                pq.offer(a - b);
+            }
+        }
+        return pq.isEmpty() ? 0 : pq.poll();
     }
 }
