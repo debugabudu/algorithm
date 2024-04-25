@@ -1,5 +1,8 @@
 package com.yliu.algorithm.design;
 
+/**
+ * 一个类只允许创建一个实例（数据在系统中只应该保存一份，或者解决资源访问冲突的问题）
+ */
 public class Singleton {
     //饿汉式，线程安全
     static class Singleton1{
