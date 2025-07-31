@@ -4,6 +4,25 @@ import com.yliu.structure.advance.Trie;
 
 import java.util.*;
 
+/**
+ * 字符串相关算法
+ * 单调栈相关：下一个更大元素、柱状图最大矩形、每日温
+ * // nums：输入数组；res：结果数组；stack：单调递减栈（存索引）
+ * int[] nextGreaterElement(int[] nums) {
+ *     int[] res = new int[nums.length];
+ *     Arrays.fill(res, -1);
+ *     Deque<Integer> stack = new ArrayDeque<>();
+ *     for (int i = 0; i < nums.length; i++) {
+ *         // 破坏递减性时弹出栈顶并记录结果
+ *         while (!stack.isEmpty() && nums[i] > nums[stack.peek()]) {
+ *             int prev = stack.pop();
+ *             res[prev] = nums[i];
+ *         }
+ *         stack.push(i);
+ *     }
+ *     return res;
+ * }
+ */
 public class StringTest {
     /**
      * 给你一个字符数组 chars ，请使用下述算法压缩：
@@ -84,75 +103,6 @@ public class StringTest {
     }
 
     /**
-     * 给定字典中的两个词，长度相等。写一个方法，把一个词转换成另一个词， 但是一次只能改变一个字符。每一步得到的新词都必须能在字典中找到。
-     * 编写一个程序，返回一个可能的转换序列。如有多个可能的转换序列，你可以返回任何一个。
-     */
-    public List<String> findLadders(String beginWord, String endWord, List<String> wordList) {
-        //定义BFS的队列
-        Queue<String> queue = new LinkedList<>();
-        //ans存放答案
-        List<String> ans = new LinkedList<>();
-        //标记是否被访问过
-        boolean[] visited = new boolean[wordList.size()];
-        //存放每个单词的前驱，比如hot的前驱可以是hit,lot等；
-        HashMap<String,String> map = new HashMap<>();
-        //初步判断
-        if(!wordList.contains(endWord)){
-            return ans;
-        }
-        //将第一个单词加入队列
-        queue.add(beginWord);
-        boolean flag = false;
-        //BFS主要操作
-        while(!queue.isEmpty()){
-            //先将头取出
-            String queueHead = queue.poll();
-            //如果队列头元素等于end word，代表已经找到，break同时设置flag = true;
-            if(queueHead.equals(endWord)){
-                flag = true;
-                break;
-            }
-            //寻找可能的元素加入队列，并且设置对应的前驱。
-            for(int i = 0;i < wordList.size();i ++){
-                //如果未被访问过并且可以直接转换，则加入队列，compare()函数用来判断是否可以转换。
-                if(!visited[i] && compare(wordList.get(i), queueHead)){
-                    queue.add(wordList.get(i));
-                    visited[i] = true;
-                    //存储前驱
-                    map.put(wordList.get(i), queueHead);
-                }
-            }
-        }
-        if(!flag){
-            return ans;
-        }
-
-        //遍历答案
-        String key = endWord;
-        while(!Objects.equals(map.get(key), beginWord)){
-            ans.add(key);
-            key = map.get(key);
-        }
-        ans.add(key);
-        ans.add(map.get(key));
-        Collections.reverse(ans);
-        return ans;
-    }
-
-    public static boolean compare(String word1,String word2){
-        int diff = 0;
-        for(int i = 0;i < word1.length();i ++){
-            if(word1.charAt(i) != word2.charAt(i)){
-                diff ++;
-                if(diff >= 2){
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
      * 给定一个字符串 s ，请你找出其中不含有重复字符的 最长子串 的长度。
      */
     public int lengthOfLongestSubstring(String s) {
@@ -170,27 +120,6 @@ public class StringTest {
             ans = Math.max(ans,rk-i);
         }
         return ans;
-    }
-
-    /**
-     * 给出一个字符串数组words 组成的一本英语词典。返回words 中最长的一个单词，该单词是由words词典中其他单词逐步添加一个字母组成。
-     * 若其中有多个可行的答案，则返回答案中字典序最小的单词。若无答案，则返回空字符串。
-     */
-    public String longestWord(String[] words) {
-        Trie trie = new Trie();
-        for (String word : words) {
-            trie.insert(word);
-        }
-        String longest = "";
-        for (String word : words) {
-            if (trie.search(word)) {
-                if (word.length() > longest.length() ||
-                        (word.length() == longest.length() && word.compareTo(longest) < 0)) {
-                    longest = word;
-                }
-            }
-        }
-        return longest;
     }
 
     /**
@@ -252,49 +181,36 @@ public class StringTest {
     }
 
     /**
-     * 每年，政府都会公布一万个最常见的婴儿名字和它们出现的频率，也就是同名婴儿的数量。
-     * 有些名字有多种拼法，例如，John 和 Jon 本质上是相同的名字，但被当成了两个名字公布出来。
-     * 给定两个列表，一个是名字及对应的频率，另一个是本质相同的名字对。设计一个算法打印出每个真实名字的实际频率。
-     * 注意，如果 John 和 Jon 是相同的，并且 Jon 和 Johnny 相同，则 John 与 Johnny 也相同，即它们有传递和对称性。
-     * 在结果列表中，选择 字典序最小 的名字作为真实名字。
+     * 给你一个以字符串表示的非负整数 num 和一个整数 k ，移除这个数中的 k 位数字，使得剩下的数字最小。请你以字符串形式返回这个最小的数字。
+     * 贪心+单调栈
+     * 相当于从左到右，每次找到比右边数字更大的数字删除
      */
-    public String[] trulyMostPopular(String[] names, String[] synonyms) {
-        Map<String, Integer> map = new HashMap<>();
-        Map<String, String> unionMap = new HashMap<>();     //并查集， key(子孙)->value(祖宗)
-        for (String name : names) {     //统计频率
-            int idx1 = name.indexOf('(');
-            int idx2 = name.indexOf(')');
-            int frequency = Integer.parseInt(name.substring(idx1 + 1, idx2));
-            map.put(name.substring(0, idx1), frequency);
-        }
-        for (String pair : synonyms) {  //union同义词
-            int idx = pair.indexOf(',');
-            String name1 = pair.substring(1, idx);
-            String name2 = pair.substring(idx + 1, pair.length() - 1);
-            while (unionMap.containsKey(name1)) {   //找name1祖宗
-                name1 = unionMap.get(name1);
+    public String removeKdigits(String num, int k) {
+        Deque<Character> deque = new LinkedList<>();
+        int length = num.length();
+        for (int i = 0; i < length; ++i) {
+            char digit = num.charAt(i);
+            while (!deque.isEmpty() && k > 0 && deque.peekLast() > digit) {
+                deque.pollLast();
+                k--;
             }
-            while (unionMap.containsKey(name2)) {   //找name2祖宗
-                name2 = unionMap.get(name2);
-            }
-            if(!name1.equals(name2)){   //祖宗不同，要合并
-                //出现次数是两者之和
-                int frequency = map.getOrDefault(name1, 0) + map.getOrDefault(name2, 0);
-                String trulyName = name1.compareTo(name2) < 0 ? name1 : name2;
-                String nickName = name1.compareTo(name2) < 0 ? name2 : name1;
-                unionMap.put(nickName, trulyName);      //小名作为大名的分支，即大名是小名的祖宗
-                map.remove(nickName);       //更新一下数据
-                map.put(trulyName, frequency);
-            }
+            deque.offerLast(digit);
         }
-        String[] res = new String[map.size()];
-        int index = 0;
-        for (String name : map.keySet()) {
-            String sb = name + '(' +
-                    map.get(name) +
-                    ')';
-            res[index++] = sb;
+
+        for (int i = 0; i < k; ++i) {
+            deque.pollLast();
         }
-        return res;
+
+        StringBuilder ret = new StringBuilder();
+        boolean leadingZero = true;
+        while (!deque.isEmpty()) {
+            char digit = deque.pollFirst();
+            if (leadingZero && digit == '0') {
+                continue;
+            }
+            leadingZero = false;
+            ret.append(digit);
+        }
+        return ret.length() == 0 ? "0" : ret.toString();
     }
 }

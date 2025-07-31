@@ -2,11 +2,26 @@ package com.yliu.algorithm.custom;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * 动态规划
- * 0-1背包、完全背包、多重背包
+ * 背包问题、最长公共子序列、最短路径、股票买卖、编辑距离
+ * // dp：状态数组；state：当前状态（如索引、容量等）
+ * void dpSolution(State state) {
+ *    // 初始化基础状态
+ *    initBaseCase(dp);
+ *    // 遍历所有状态
+ *    for (State s : allStates) {
+ *       // 遍历所有选择（决策）
+ *       for (Choice choice : choices) {
+ *           // 状态转移方程
+ *           if (isValid(s, choice)) {
+ *               dp[s] = transfer(dp[prevState], choice);
+ *           }
+ *       }
+ *    }
+ *    return dp[targetState];
+ * }
  */
 public class Dynamic {
     /**
@@ -63,29 +78,6 @@ public class Dynamic {
             }
         }
         return dp[amount] > amount ? -1 : dp[amount];
-    }
-
-    /**
-     * 给定一个三角形 triangle ，找出自顶向下的最小路径和。
-     * 每一步只能移动到下一行中相邻的结点上。相邻的结点 在这里指的是 下标 与 上一层结点下标 相同或者等于 上一层结点下标 + 1 的两个结点。
-     * 也就是说，如果正位于当前行的下标 i ，那么下一步可以移动到下一行的下标 i 或 i + 1 。
-     */
-    public int minimumTotal(List<List<Integer>> triangle) {
-        int n = triangle.size();
-        int[][] f = new int[n][n];
-        f[0][0] = triangle.get(0).get(0);
-        for (int i = 1; i < n; ++i) {
-            f[i][0] = f[i - 1][0] + triangle.get(i).get(0);
-            for (int j = 1; j < i; ++j) {
-                f[i][j] = Math.min(f[i - 1][j - 1], f[i - 1][j]) + triangle.get(i).get(j);
-            }
-            f[i][i] = f[i - 1][i - 1] + triangle.get(i).get(i);
-        }
-        int minTotal = f[n - 1][0];
-        for (int i = 1; i < n; ++i) {
-            minTotal = Math.min(minTotal, f[n - 1][i]);
-        }
-        return minTotal;
     }
 
     /**
@@ -313,28 +305,6 @@ public class Dynamic {
     }
 
     /**
-     * 给你一个字符串 s ，找出其中最长的回文子序列，并返回该序列的长度。
-     * 子序列定义为：不改变剩余字符顺序的情况下，删除某些字符或者不删除任何字符形成的一个序列。
-     */
-    public int longestPalindromeSubSeq(String s) {
-        int n = s.length();
-        int[][] dp = new int[n][n];
-        for (int i = n - 1; i >= 0; i--) {
-            dp[i][i] = 1;
-            char c1 = s.charAt(i);
-            for (int j = i + 1; j < n; j++) {
-                char c2 = s.charAt(j);
-                if (c1 == c2) {
-                    dp[i][j] = dp[i + 1][j - 1] + 2;
-                } else {
-                    dp[i][j] = Math.max(dp[i + 1][j], dp[i][j - 1]);
-                }
-            }
-        }
-        return dp[0][n - 1];
-    }
-
-    /**
      * 无重叠区间
      * 给定一个区间的集合 intervals ，其中 intervals[i] = [starti, endi] 。返回 需要移除区间的最小数量，使剩余区间互不重叠 。
      */
@@ -387,58 +357,5 @@ public class Dynamic {
             res = Math.max(res, rightSum + leftMax[i - 1]);
         }
         return res;
-    }
-
-    /**
-     * 堆箱子。给你一堆n个箱子，箱子宽 wi、深 di、高 hi。箱子不能翻转，将箱子堆起来时，下面箱子的宽度、高度和深度必须大于上面的箱子。
-     * 实现一种方法，搭出最高的一堆箱子。箱堆的高度为每个箱子高度的总和。
-     */
-    public int pileBox(int[][] box) {
-        Arrays.sort(box, Comparator.comparingInt(x -> x[0]));
-        int[] dp = new int[box.length];
-        int res = 0;
-        for(int i = 0; i < box.length; ++i){
-            for(int j = 0; j < i; ++j){
-                // i 的三维都要比 j 大
-                if(box[i][0] > box[j][0] && box[i][1] > box[j][1] && box[i][2] > box[j][2]){
-                    //在 0 <= j < i 范围内找到最大的 dp[j]
-                    dp[i] = Math.max(dp[i], dp[j]);
-                }
-            }
-            //最后加上最底端箱子的高度
-            dp[i] += box[i][2];
-            res = Math.max(dp[i], res);
-        }
-        return res;
-    }
-
-    /**
-     * 给定一个方阵，其中每个单元(像素)非黑即白。设计一个算法，找出 4 条边皆为黑色像素的最大子方阵。
-     * 返回一个数组 [r, c, size] ，其中 r, c 分别代表子方阵左上角的行号和列号，size 是子方阵的边长。
-     * 若有多个满足条件的子方阵，返回 r 最小的，若 r 相同，返回 c 最小的子方阵。若无满足条件的子方阵，返回空数组。
-     */
-    public int[] findSquare(int[][] matrix) {
-        int n = matrix.length;
-        int[][] left = new int[n + 1][n + 1];
-        int[][] up = new int[n + 1][n + 1];
-        int r = 0, c = 0, size = 0;
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
-                if (matrix[i - 1][j - 1] == 0) {
-                    left[i][j] = left[i][j - 1] + 1;
-                    up[i][j] = up[i - 1][j] + 1;
-                    int border = Math.min(left[i][j], up[i][j]);
-                    while (left[i - border + 1][j] < border || up[i][j - border + 1] < border) {
-                        border--;
-                    }
-                    if (border > size) {
-                        r = i - border;
-                        c = j - border;
-                        size = border;
-                    }
-                }
-            }
-        }
-        return size > 0 ? new int[]{r, c, size} : new int[0];
     }
 }

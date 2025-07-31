@@ -3,8 +3,70 @@ package com.yliu.algorithm.custom;
 import java.util.*;
 
 /**
- * 深度优先搜索和广度优先搜索
- * 拓扑排序（针对有向无环图，在有依赖关系的情况下，进行排序）
+ * 深度优先搜索：二叉树遍历、图的连通分量、岛屿问题
+ * // node：当前节点；visited：访问标记；res：结果集
+ * void dfs(Node node, boolean[] visited, List<State> res) {
+ *     // 终止条件：到达目标或无效节点
+ *     if (node == null || visited[node]) return;
+ *     // 标记访问并处理当前节点
+ *     visited[node] = true;
+ *     processNode(node, res);
+ *     // 遍历邻居节点
+ *     for (Node neighbor : node.neighbors) {
+ *         // 递归深入未访问节点
+ *         if (!visited[neighbor]) {
+ *             dfs(neighbor, visited, res);
+ *         }
+ *     }
+ *     // 回溯：某些问题需撤销访问标记（如回溯法）
+ *     // visited[node] = false;
+ * }
+ *
+ * 广度优先搜索：最短路径（无权图）、层序遍历、迷宫最短步数
+ * // start：起始节点；dist：距离记录；queue：辅助队列
+ * void bfs(Node start, int[] dist) {
+ *     Queue<Node> queue = new LinkedList<>();
+ *     queue.offer(start);
+ *     dist[start] = 0; // 初始化距离
+ *     while (!queue.isEmpty()) {
+ *         Node cur = queue.poll();
+ *         // 处理当前节点（如到达终点）
+ *         if (isTarget(cur)) return;
+ *         // 遍历邻居节点
+ *         for (Node neighbor : cur.neighbors) {
+ *             // 剪枝：未访问过的节点入队
+ *             if (dist[neighbor] == -1) {
+ *                 dist[neighbor] = dist[cur] + 1;
+ *                 queue.offer(neighbor);
+ *             }
+ *         }
+ *     }
+ * }
+ * 拓扑排序（针对有向无环图，在有依赖关系的情况下，进行排序）：课程表、任务调度、依赖解析
+ * // graph：邻接表；indegree：入度数组；queue：零入度节点队列
+ * List<Integer> topologicalSort(List<Integer>[] graph, int n) {
+ *     int[] indegree = new int[n];
+ *     // 统计入度
+ *     for (List<Integer> neighbors : graph) {
+ *         for (int neighbor : neighbors) indegree[neighbor]++;
+ *     }
+ *     Queue<Integer> queue = new LinkedList<>();
+ *     for (int i = 0; i < n; i++) {
+ *         if (indegree[i] == 0) queue.offer(i);
+ *     }
+ *     List<Integer> order = new ArrayList<>();
+ *     while (!queue.isEmpty()) {
+ *         int cur = queue.poll();
+ *         order.add(cur);
+ *         // 删除当前节点，更新邻居入度
+ *         for (int neighbor : graph[cur]) {
+ *             if (--indegree[neighbor] == 0) {
+ *                 queue.offer(neighbor);
+ *             }
+ *         }
+ *     }
+ *     return order.size() == n ? order : Collections.emptyList(); // 判断是否有环
+ * }
  */
 public class Graph {
     /**
@@ -82,56 +144,6 @@ public class Graph {
     }
 
     /**
-     * 在给定的m x n网格grid中，每个单元格可以有以下三个值之一：
-     * 值0代表空单元格；
-     * 值1代表新鲜橘子；
-     * 值2代表腐烂的橘子。
-     * 每分钟，腐烂的橘子周围4个方向上相邻的新鲜橘子都会腐烂。
-     * 返回 直到单元格中没有新鲜橘子为止所必须经过的最小分钟数。如果不可能，返回-1。
-     * 多源广度优先搜索
-     */
-    public int orangesRotting(int[][] grid) {
-        int[] dr = new int[]{-1, 0, 1, 0};
-        int[] dc = new int[]{0, -1, 0, 1};
-        int R = grid.length, C = grid[0].length;
-        Queue<Integer> queue = new ArrayDeque<>();
-        Map<Integer, Integer> depth = new HashMap<>();
-        for (int r = 0; r < R; ++r) {
-            for (int c = 0; c < C; ++c) {
-                if (grid[r][c] == 2) {
-                    int code = r * C + c;
-                    queue.add(code);
-                    depth.put(code, 0);
-                }
-            }
-        }
-        int ans = 0;
-        while (!queue.isEmpty()) {
-            int code = queue.remove();
-            int r = code / C, c = code % C;
-            for (int k = 0; k < 4; ++k) {
-                int nr = r + dr[k];
-                int nc = c + dc[k];
-                if (0 <= nr && nr < R && 0 <= nc && nc < C && grid[nr][nc] == 1) {
-                    grid[nr][nc] = 2;
-                    int ncode = nr * C + nc;
-                    queue.add(ncode);
-                    depth.put(ncode, depth.get(code) + 1);
-                    ans = depth.get(ncode);
-                }
-            }
-        }
-        for (int[] row: grid) {
-            for (int v: row) {
-                if (v == 1) {
-                    return -1;
-                }
-            }
-        }
-        return ans;
-    }
-
-    /**
      * 给你一个由 '1'（陆地）和 '0'（水）组成的的二维网格，请你计算网格中岛屿的数量。
      */
     public int numIslands(char[][] grid) {
@@ -176,89 +188,6 @@ public class Graph {
     }
 
     /**
-     * 在给定的二维二进制数组A中，存在两座岛。（岛是由四面相连的 1 形成的一个最大组。）
-     * 现在，我们可以将0变为1，以使两座岛连接起来，变成一座岛。
-     * 返回必须翻转的0 的最小数目。（可以保证答案至少是 1 。）
-     */
-    public int shortestBridge(int[][] A) {
-        int R = A.length, C = A[0].length;
-        int[][] colors = getComponents(A);
-        Queue<Node> queue = new LinkedList<>();
-        Set<Integer> target = new HashSet<>();
-
-        for (int r = 0; r < R; ++r) {
-            for (int c = 0; c < C; ++c) {
-                if (colors[r][c] == 1) {
-                    queue.add(new Node(r, c, 0));
-                } else if (colors[r][c] == 2) {
-                    target.add(r * C + c);
-                }
-            }
-        }
-        while (!queue.isEmpty()) {
-            Node node = queue.poll();
-            if (target.contains(node.r * C + node.c))
-                return node.depth - 1;
-            for (int nei: neighbors(A, node.r, node.c)) {
-                int nr = nei / C, nc = nei % C;
-                if (colors[nr][nc] != 1) {
-                    queue.add(new Node(nr, nc, node.depth + 1));
-                    colors[nr][nc] = 1;
-                }
-            }
-        }
-        return 0;
-    }
-
-    public int[][] getComponents(int[][] A) {
-        int R = A.length, C = A[0].length;
-        int[][] colors = new int[R][C];
-        int t = 0;
-
-        for (int r0 = 0; r0 < R; ++r0)
-            for (int c0 = 0; c0 < C; ++c0)
-                if (colors[r0][c0] == 0 && A[r0][c0] == 1) {
-                    // Start dfs
-                    Stack<Integer> stack = new Stack<>();
-                    stack.push(r0 * C + c0);
-                    colors[r0][c0] = ++t;
-
-                    while (!stack.isEmpty()) {
-                        int node = stack.pop();
-                        int r = node / C, c = node % C;
-                        for (int nei: neighbors(A, r, c)) {
-                            int nr = nei / C, nc = nei % C;
-                            if (A[nr][nc] == 1 && colors[nr][nc] == 0) {
-                                colors[nr][nc] = t;
-                                stack.push(nr * C + nc);
-                            }
-                        }
-                    }
-                }
-
-        return colors;
-    }
-
-    public List<Integer> neighbors(int[][] A, int r, int c) {
-        int R = A.length, C = A[0].length;
-        List<Integer> ans = new ArrayList<>();
-        if (0 <= r-1) ans.add((r-1) * R + c);
-        if (0 <= c-1) ans.add(r * R + (c-1));
-        if (r+1 < R) ans.add((r+1) * R + c);
-        if (c+1 < C) ans.add(r * R + (c+1));
-        return ans;
-    }
-
-    static class Node {
-        int r, c, depth;
-        Node(int r, int c, int d) {
-            this.r = r;
-            this.c = c;
-            depth = d;
-        }
-    }
-
-    /**
      * 用以太网线缆将n台计算机连接成一个网络，计算机的编号从0到n-1。
      * 线缆用connections表示，其中connections[i] = [a, b]连接了计算机a和b。
      * 网络中的任何一台计算机都可以通过网络直接或者间接访问同一个网络中其他任意一台计算机。
@@ -296,85 +225,6 @@ public class Graph {
                 dfs(v,edges,used);
             }
         }
-    }
-
-    /**
-     * 有一个有 n 个节点的有向图，节点按 0 到 n - 1 编号。图由一个 索引从 0 开始 的 2D 整数数组graph表示，
-     * graph[i]是与节点 i 相邻的节点的整数数组，这意味着从节点 i 到graph[i]中的每个节点都有一条边。
-     * 如果一个节点没有连出的有向边，则它是 终端节点 。如果没有出边，则节点为终端节点。
-     * 如果从该节点开始的所有可能路径都通向 终端节点 ，则该节点为 安全节点 。
-     * 返回一个由图中所有 安全节点 组成的数组作为答案。答案数组中的元素应当按 升序 排列。
-     */
-    public List<Integer> eventualSafeNodes(int[][] graph) {
-        int n = graph.length;
-        int[] color = new int[n];
-        List<Integer> ans = new ArrayList<>();
-        for (int i = 0; i < n; ++i) {
-            if (safe(graph, color, i)) {
-                ans.add(i);
-            }
-        }
-        return ans;
-    }
-
-    public boolean safe(int[][] graph, int[] color, int x) {
-        if (color[x] > 0) {
-            return color[x] == 2;
-        }
-        color[x] = 1;
-        for (int y : graph[x]) {
-            if (!safe(graph, color, y)) {
-                return false;
-            }
-        }
-        color[x] = 2;
-        return true;
-    }
-
-    /**
-     * 有两个水壶，容量分别为jug1Capacity和 jug2Capacity 升。水的供应是无限的。确定是否有可能使用这两个壶准确得到targetCapacity 升。
-     * 如果可以得到targetCapacity升水，最后请用以上水壶中的一或两个来盛放取得的targetCapacity升水。
-     * 你可以：
-     * 装满任意一个水壶
-     * 清空任意一个水壶
-     * 从一个水壶向另外一个水壶倒水，直到装满或者倒空
-     */
-    public boolean canMeasureWater(int x, int y, int z) {
-        Deque<int[]> stack = new LinkedList<>();
-        stack.push(new int[]{0, 0});
-        Set<Long> seen = new HashSet<>();
-        while (!stack.isEmpty()) {
-            if (seen.contains(hash(stack.peek()))) {
-                stack.pop();
-                continue;
-            }
-            seen.add(hash(stack.peek()));
-
-            int[] state = stack.pop();
-            int remain_x = state[0], remain_y = state[1];
-            if (remain_x == z || remain_y == z || remain_x + remain_y == z) {
-                return true;
-            }
-            // 把 X 壶灌满。
-            stack.push(new int[]{x, remain_y});
-            // 把 Y 壶灌满。
-            stack.push(new int[]{remain_x, y});
-            // 把 X 壶倒空。
-            stack.push(new int[]{0, remain_y});
-            // 把 Y 壶倒空。
-            stack.push(new int[]{remain_x, 0});
-            // 把 X 壶的水灌进 Y 壶，直至灌满或倒空。
-            stack.push(new int[]{remain_x - Math.min(remain_x, y - remain_y),
-                    remain_y + Math.min(remain_x, y - remain_y)});
-            // 把 Y 壶的水灌进 X 壶，直至灌满或倒空。
-            stack.push(new int[]{remain_x + Math.min(remain_y, x - remain_x),
-                    remain_y - Math.min(remain_y, x - remain_x)});
-        }
-        return false;
-    }
-
-    public long hash(int[] state) {
-        return (long) state[0] * 1000001 + state[1];
     }
 
     /**
@@ -444,38 +294,6 @@ public class Graph {
     }
 
     /**
-     * 给定一组n人（编号为1, 2, ..., n），我们想把每个人分进任意大小的两组。每个人都可能不喜欢其他人，那么他们不应该属于同一组。
-     * 给定整数 n和数组 dislikes，其中dislikes[i] = [ai, bi]，表示不允许将编号为 ai和bi的人归入同一组。
-     * 当可以用这种方法将所有人分进两组时，返回 true；否则返回 false。
-     */
-    public boolean possibleBiPartition(int N, int[][] dislikes) {
-        ArrayList<Integer>[] graph = new ArrayList[N+1];
-        Map<Integer, Integer> color = new HashMap<>();
-        for (int i = 1; i <= N; ++i)
-            graph[i] = new ArrayList<>();
-
-        for (int[] edge: dislikes) {
-            graph[edge[0]].add(edge[1]);
-            graph[edge[1]].add(edge[0]);
-        }
-        for (int node = 1; node <= N; ++node)
-            if (!color.containsKey(node) && !dfs(node, 0, color,graph))
-                return false;
-        return true;
-    }
-
-    public boolean dfs(int node, int c, Map<Integer, Integer> color, ArrayList<Integer>[] graph) {
-        if (color.containsKey(node))
-            return color.get(node) == c;
-        color.put(node, c);
-
-        for (int nei: graph[node])
-            if (!dfs(nei, c ^ 1, color,graph))
-                return false;
-        return true;
-    }
-
-    /**
      * 拓扑排序
      * 给定一个长度为 n 的整数数组 nums ，其中 nums 是范围为 [1，n] 的整数的排列。
      * 还提供了一个 2D 整数数组sequences，其中sequences[i]是nums的子序列。
@@ -522,5 +340,49 @@ public class Graph {
             }
         }
         return true;
+    }
+
+    /**
+     * 给定一个m x n 二维字符网格board 和一个字符串单词word 。如果word 存在于网格中，返回 true ；否则，返回 false 。
+     * 单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。
+     * 同一个单元格内的字母不允许被重复使用
+     */
+    public boolean exist(char[][] board, String word) {
+        int h = board.length, w = board[0].length;
+        boolean[][] visited = new boolean[h][w];
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                boolean flag = check(board, visited, i, j, word, 0);
+                if (flag) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean check(char[][] board, boolean[][] visited, int i, int j, String s, int k) {
+        if (board[i][j] != s.charAt(k)) {
+            return false;
+        } else if (k == s.length() - 1) {
+            return true;
+        }
+        visited[i][j] = true;
+        int[][] directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        boolean result = false;
+        for (int[] dir : directions) {
+            int newi = i + dir[0], newj = j + dir[1];
+            if (newi >= 0 && newi < board.length && newj >= 0 && newj < board[0].length) {
+                if (!visited[newi][newj]) {
+                    boolean flag = check(board, visited, newi, newj, s, k + 1);
+                    if (flag) {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+        }
+        visited[i][j] = false;
+        return result;
     }
 }

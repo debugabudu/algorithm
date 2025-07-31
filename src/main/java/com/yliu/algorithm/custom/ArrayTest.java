@@ -63,43 +63,6 @@ public class ArrayTest {
     }
 
     /**
-     * 给你两个下标从 0 开始的整数数组 nums1 和 nums2 ，两者长度都是 n ，再给你一个正整数 k 。
-     * 你必须从 nums1 中选一个长度为 k 的 子序列 对应的下标。
-     * 对于选择的下标 i0 ，i1 ，...， ik - 1 ，你的 分数 定义如下：
-     * nums1 中下标对应元素求和，乘以 nums2 中下标对应元素的 最小值 。
-     * 用公式表示： (nums1[i0] + nums1[i1] +...+ nums1[ik - 1]) * min(nums2[i0] , nums2[i1], ... ,nums2[ik - 1]) 。
-     * 请你返回 最大 可能的分数。
-     * 一个数组的 子序列 下标是集合 {0, 1, ..., n-1} 中删除若干元素得到的剩余集合，也可以不删除任何元素
-     */
-    public long maxScore(int[] nums1, int[] nums2, int k) {
-        int n = nums1.length;
-        Integer[] ids = new Integer[n];
-        for (int i = 0; i < n; i++) {
-            ids[i] = i;
-        }
-        // 对下标排序，不影响原数组的顺序
-        java.util.Arrays.sort(ids, (i, j) -> nums2[j] - nums2[i]);
-
-        PriorityQueue<Integer> pq = new PriorityQueue<>();
-        long sum = 0;
-        for (int i = 0; i < k; i++) {
-            sum += nums1[ids[i]];
-            pq.offer(nums1[ids[i]]);
-        }
-
-        long ans = sum * nums2[ids[k - 1]];
-        for (int i = k; i < n; i++) {
-            int x = nums1[ids[i]];
-            if (x > pq.peek()) {
-                sum += x - pq.poll();
-                pq.offer(x);
-                ans = Math.max(ans, sum * nums2[ids[i]]);
-            }
-        }
-        return ans;
-    }
-
-    /**
      * 给定 N 个人的出生年份和死亡年份，第 i 个人的出生年份为 birth[i]，死亡年份为 death[i]，实现一个方法以计算生存人数最多的年份。
      * 你可以假设所有人都出生于 1900 年至 2000 年（含 1900 和 2000 ）之间。
      * 如果一个人在某一年的任意时期处于生存状态，那么他应该被纳入那一年的统计中。
@@ -202,65 +165,6 @@ public class ArrayTest {
     }
 
     /**
-     * 给你一个由 n 个整数组成的数组nums ，和一个目标值 target 。
-     * 请你找出并返回满足下述全部条件且不重复的四元组[nums[a], nums[b], nums[c], nums[d]]
-     * （若两个四元组元素一一对应，则认为两个四元组重复）：
-     * 0 <= a, b, c, d< n
-     * a、b、c 和 d 互不相同
-     * nums[a] + nums[b] + nums[c] + nums[d] == target
-     */
-    public List<List<Integer>> fourSum(int[] nums, int target) {
-        List<List<Integer>> quadruplets = new ArrayList<>();
-        if (nums == null || nums.length < 4) {
-            return quadruplets;
-        }
-        java.util.Arrays.sort(nums);
-        int length = nums.length;
-        for (int i = 0; i < length - 3; i++) {
-            if (i > 0 && nums[i] == nums[i - 1]) {
-                continue;
-            }
-            if ((long) nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3] > target) {
-                break;
-            }
-            if ((long) nums[i] + nums[length - 3] + nums[length - 2] + nums[length - 1] < target) {
-                continue;
-            }
-            for (int j = i + 1; j < length - 2; j++) {
-                if (j > i + 1 && nums[j] == nums[j - 1]) {
-                    continue;
-                }
-                if ((long) nums[i] + nums[j] + nums[j + 1] + nums[j + 2] > target) {
-                    break;
-                }
-                if ((long) nums[i] + nums[j] + nums[length - 2] + nums[length - 1] < target) {
-                    continue;
-                }
-                int left = j + 1, right = length - 1;
-                while (left < right) {
-                    int sum = nums[i] + nums[j] + nums[left] + nums[right];
-                    if (sum == target) {
-                        quadruplets.add(java.util.Arrays.asList(nums[i], nums[j], nums[left], nums[right]));
-                        while (left < right && nums[left] == nums[left + 1]) {
-                            left++;
-                        }
-                        left++;
-                        while (left < right && nums[right] == nums[right - 1]) {
-                            right--;
-                        }
-                        right--;
-                    } else if (sum < target) {
-                        left++;
-                    } else {
-                        right--;
-                    }
-                }
-            }
-        }
-        return quadruplets;
-    }
-
-    /**
      * 假设你有两个数组，一个长一个短，短的元素均不相同。找到长数组中包含短数组所有的元素的最短子数组，其出现顺序无关紧要。
      * 返回最短子数组的左端点和右端点，如有多个满足条件的子数组，返回左端点最小的一个。若不存在，返回空数组。
      */
@@ -302,27 +206,6 @@ public class ArrayTest {
     }
 
     /**
-     * 给你一个非负整数数组nums ，你最初位于数组的第一个位置。
-     * 数组中的每个元素代表你在该位置可以跳跃的最大长度。
-     * 你的目标是使用最少的跳跃次数到达数组的最后一个位置。
-     * 假设你总是可以到达数组的最后一个位置。
-     */
-    public int jump(int[] nums) {
-        int position = nums.length - 1;
-        int steps = 0;
-        while (position > 0) {
-            for (int i = 0; i < position; i++) {
-                if (i + nums[i] >= position) {
-                    position = i;
-                    steps++;
-                    break;
-                }
-            }
-        }
-        return steps;
-    }
-
-    /**
      * 给定一个二进制数组 nums , 找到含有相同数量的 0 和 1 的最长连续子数组，并返回该子数组的长度。
      */
     public int findMaxLength(int[] nums) {
@@ -346,27 +229,5 @@ public class ArrayTest {
             }
         }
         return maxLength;
-    }
-
-    /**
-     * 假设有打乱顺序的一群人站成一个队列，数组 people 表示队列中一些人的属性（不一定按顺序）。
-     * 每个 people[i] = [hi, ki] 表示第 i 个人的身高为 hi ，前面 正好 有 ki 个身高大于或等于 hi 的人。
-     * 请你重新构造并返回输入数组people 所表示的队列。
-     * 返回的队列应该格式化为数组 queue ，其中 queue[j] = [hj, kj] 是队列中第 j 个人的属性（queue[0] 是排在队列前面的人）。
-     */
-    public int[][] reconstructQueue(int[][] people) {
-        // 身高从大到小排（身高相同k小的站前面）
-        java.util.Arrays.sort(people, (a, b) -> {
-            if (a[0] == b[0]) return a[1] - b[1];
-            return b[0] - a[0];
-        });
-
-        LinkedList<int[]> que = new LinkedList<>();
-
-        for (int[] p : people) {
-            que.add(p[1],p);
-        }
-
-        return que.toArray(new int[people.length][]);
     }
 }

@@ -3,7 +3,9 @@ package com.yliu.algorithm.custom;
 import java.util.*;
 
 /**
- * 回溯-穷举（全排列、子集和、n皇后、数独）
+ * 回溯-穷举（常见题型全排列、子集和、n皇后、数独）
+ * //state：一个解；choices：全部可选项；res：解的集合
+ * //另一种解法是传index，表示当前选择的可选项下标
  * void backtrack(State state, List<Choice> choices, List<State> res) {
  *     // 判断是否为解
  *     if (isSolution(state)) {
@@ -14,7 +16,7 @@ import java.util.*;
  *     }
  *     // 遍历所有选择
  *     for (Choice choice : choices) {
- *         // 剪枝：判断选择是否合法
+ *         // 剪枝：判断选择是否合法（剪枝：记录状态的集合或是否满足条件）
  *         if (isValid(state, choice)) {
  *             // 尝试：做出选择，更新状态
  *             makeChoice(state, choice);
@@ -94,50 +96,6 @@ public class BackTrack {
     }
 
     /**
-     * 给定一个m x n 二维字符网格board 和一个字符串单词word 。如果word 存在于网格中，返回 true ；否则，返回 false 。
-     * 单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。
-     * 同一个单元格内的字母不允许被重复使用
-     */
-    public boolean exist(char[][] board, String word) {
-        int h = board.length, w = board[0].length;
-        boolean[][] visited = new boolean[h][w];
-        for (int i = 0; i < h; i++) {
-            for (int j = 0; j < w; j++) {
-                boolean flag = check(board, visited, i, j, word, 0);
-                if (flag) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean check(char[][] board, boolean[][] visited, int i, int j, String s, int k) {
-        if (board[i][j] != s.charAt(k)) {
-            return false;
-        } else if (k == s.length() - 1) {
-            return true;
-        }
-        visited[i][j] = true;
-        int[][] directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-        boolean result = false;
-        for (int[] dir : directions) {
-            int newi = i + dir[0], newj = j + dir[1];
-            if (newi >= 0 && newi < board.length && newj >= 0 && newj < board[0].length) {
-                if (!visited[newi][newj]) {
-                    boolean flag = check(board, visited, newi, newj, s, k + 1);
-                    if (flag) {
-                        result = true;
-                        break;
-                    }
-                }
-            }
-        }
-        visited[i][j] = false;
-        return result;
-    }
-
-    /**
      * 给你一个 无重复元素 的整数数组candidates 和一个目标整数target，找出candidates中可以使数字和为目标数target 的 所有不同组合 ，
      * 并以列表形式返回。你可以按 任意顺序 返回这些组合。
      * candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。
@@ -200,43 +158,6 @@ public class BackTrack {
             backTracking(candidates, target-candidates[i], i + 1, ans, path);
             path.remove(path.size()-1);
         }
-    }
-
-    /**
-     * 给你一个字符串 s，请你将 s 分割成一些子串，使每个子串都是 回文串 。返回 s 所有可能的分割方案。
-     */
-    public List<List<String>> partition(String s) {
-        List<List<String>> res = new ArrayList<>();
-        List<String> path = new ArrayList<>();
-        backTracking(s, 0, res, path);
-        return res;
-    }
-
-    private void backTracking(String s, int index, List<List<String>> res, List<String> path){
-        if (index >= s.length()){
-            res.add(new ArrayList<>(path));
-            return;
-        }
-        for (int i=index; i<s.length(); i++){
-            if (isValid(s, index, i)){
-                path.add(s.substring(index, i+1));
-            }else {
-                continue;
-            }
-            backTracking(s, i+1, res, path);
-            path.remove(path.size()-1);
-        }
-    }
-
-    private boolean isValid(String s, int l, int r){
-        while (l < r){
-            if (s.charAt(l) != s.charAt(r)){
-                return false;
-            }
-            l++;
-            r--;
-        }
-        return true;
     }
 
     /**

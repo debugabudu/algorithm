@@ -108,23 +108,6 @@ public class MyHeap {
     }
 
     /**
-     * topk问题，找出数组中前k大的元素，直接排序-O(nlogn)，使用堆-O(nlogk)
-     */
-    public Queue<Integer> topK(int[] nums, int k){
-        Queue<Integer> pq = new PriorityQueue<>();
-        for (int i=0; i<k; i++){
-            pq.offer(nums[i]);
-        }
-        for (int i=k; i<nums.length; i++){
-            if (!pq.isEmpty() && nums[i] > pq.peek()){
-                pq.poll();
-                pq.offer(nums[i]);
-            }
-        }
-        return pq;
-    }
-
-    /**
      * 我们把只包含质因子 2、3 和 5 的数称作丑数（Ugly Number）。求按从小到大的顺序的第 n 个丑数。
      */
     public int nthUglyNumber(int n) {
