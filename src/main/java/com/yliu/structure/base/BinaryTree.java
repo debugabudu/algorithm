@@ -150,4 +150,56 @@ public class BinaryTree {
         node.right = helper1(endPost-1,index+1,inEnd,inOrder,postOrder);
         return node;
     }
+
+    /**
+     * 给你一棵根为 root 的二叉树，请你返回二叉树中好节点的数目。
+     * 「好节点」X 定义为：从根到该节点 X 所经过的节点中，没有任何节点的值大于 X 的值。
+     */
+    int goodNodes(TreeNode root) {
+        return dfs(root, Integer.MIN_VALUE);
+    }
+
+    int dfs(TreeNode root, int pathMax) {
+        if (root == null) {
+            return 0;
+        }
+        int res = 0;
+        if (root.value >= pathMax) {
+            res++;
+            pathMax = root.value;
+        }
+        res += dfs(root.left, pathMax) + dfs(root.right, pathMax);
+        return res;
+    }
+
+    /**
+     * 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。(自己可以是自己的祖先)
+     */
+    void dfs(TreeNode root, Map<Integer, TreeNode> parent) {
+        if (root.left != null) {
+            parent.put(root.left.value, root);
+            dfs(root.left, parent);
+        }
+        if (root.right != null) {
+            parent.put(root.right.value, root);
+            dfs(root.right, parent);
+        }
+    }
+
+    TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        Map<Integer, TreeNode> parent = new HashMap<>();
+        Set<Integer> visited = new HashSet<>();
+        dfs(root, parent);
+        while (p != null) {
+            visited.add(p.value);
+            p = parent.get(p.value);
+        }
+        while (q != null) {
+            if (visited.contains(q.value)) {
+                return q;
+            }
+            q = parent.get(q.value);
+        }
+        return null;
+    }
 }

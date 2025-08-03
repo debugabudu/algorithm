@@ -6,22 +6,6 @@ import java.util.*;
 
 /**
  * 字符串相关算法
- * 单调栈相关：下一个更大元素、柱状图最大矩形、每日温
- * // nums：输入数组；res：结果数组；stack：单调递减栈（存索引）
- * int[] nextGreaterElement(int[] nums) {
- *     int[] res = new int[nums.length];
- *     Arrays.fill(res, -1);
- *     Deque<Integer> stack = new ArrayDeque<>();
- *     for (int i = 0; i < nums.length; i++) {
- *         // 破坏递减性时弹出栈顶并记录结果
- *         while (!stack.isEmpty() && nums[i] > nums[stack.peek()]) {
- *             int prev = stack.pop();
- *             res[prev] = nums[i];
- *         }
- *         stack.push(i);
- *     }
- *     return res;
- * }
  */
 public class StringTest {
     /**
@@ -212,5 +196,35 @@ public class StringTest {
             ret.append(digit);
         }
         return ret.length() == 0 ? "0" : ret.toString();
+    }
+
+    /**
+     * 给定一个经过编码的字符串，返回它解码后的字符串。
+     * 编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。注意 k 保证为正整数。
+     * 你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+     * 此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k ，例如不会出现像 3a 或 2[4] 的输入。
+     */
+    public String decodeString(String s) {
+        StringBuilder res = new StringBuilder();
+        int multi = 0;
+        LinkedList<Integer> stack_multi = new LinkedList<>();
+        LinkedList<String> stack_res = new LinkedList<>();
+        for(Character c : s.toCharArray()) {
+            if(c == '[') {
+                stack_multi.addLast(multi);
+                stack_res.addLast(res.toString());
+                multi = 0;
+                res = new StringBuilder();
+            }
+            else if(c == ']') {
+                StringBuilder tmp = new StringBuilder();
+                int cur_multi = stack_multi.removeLast();
+                tmp.append(String.valueOf(res).repeat(cur_multi));
+                res = new StringBuilder(stack_res.removeLast() + tmp);
+            }
+            else if(c >= '0' && c <= '9') multi = multi * 10 + Integer.parseInt(c + "");
+            else res.append(c);
+        }
+        return res.toString();
     }
 }

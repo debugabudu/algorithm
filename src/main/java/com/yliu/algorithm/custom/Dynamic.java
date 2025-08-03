@@ -305,30 +305,6 @@ public class Dynamic {
     }
 
     /**
-     * 无重叠区间
-     * 给定一个区间的集合 intervals ，其中 intervals[i] = [starti, endi] 。返回 需要移除区间的最小数量，使剩余区间互不重叠 。
-     */
-    public int eraseOverlapIntervals(int[][] intervals) {
-        if (intervals.length == 0) {
-            return 0;
-        }
-
-        Arrays.sort(intervals, Comparator.comparingInt(interval -> interval[0]));
-
-        int n = intervals.length;
-        int[] f = new int[n];
-        Arrays.fill(f, 1);
-        for (int i = 1; i < n; ++i) {
-            for (int j = 0; j < i; ++j) {
-                if (intervals[j][1] <= intervals[i][0]) {
-                    f[i] = Math.max(f[i], f[j] + 1);
-                }
-            }
-        }
-        return n - Arrays.stream(f).max().getAsInt();
-    }
-
-    /**
      * 给定一个长度为 n 的环形整数数组 nums ，返回 nums 的非空 子数组 的最大可能和 。
      * 环形数组 意味着数组的末端将会与开头相连呈环状。形式上，
      * nums[i] 的下一个元素是 nums[(i + 1) % n] ， nums[i] 的前一个元素是 nums[(i - 1 + n) % n] 。

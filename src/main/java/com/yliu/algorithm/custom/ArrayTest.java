@@ -4,6 +4,22 @@ import java.util.*;
 
 /**
  * 字符串和数组相关问题
+ * 单调栈相关：下一个更大元素、柱状图最大矩形、每日温
+ * // nums：输入数组；res：结果数组；stack：单调递减栈（存索引）
+ * int[] nextGreaterElement(int[] nums) {
+ *     int[] res = new int[nums.length];
+ *     Arrays.fill(res, -1);
+ *     Deque<Integer> stack = new ArrayDeque<>();
+ *     for (int i = 0; i < nums.length; i++) {
+ *         // 破坏递减性时弹出栈顶并记录结果
+ *         while (!stack.isEmpty() && nums[i] > nums[stack.peek()]) {
+ *             int prev = stack.pop();
+ *             res[prev] = nums[i];
+ *         }
+ *         stack.push(i);
+ *     }
+ *     return res;
+ * }
  */
 public class ArrayTest {
 
@@ -229,5 +245,74 @@ public class ArrayTest {
             }
         }
         return maxLength;
+    }
+
+    /**
+     * 给你一个整数数组 nums ，判断这个数组中是否存在长度为 3 的递增子序列。
+     * 如果存在这样的三元组下标 (i, j, k) 且满足 i < j < k ，使得 nums[i] < nums[j] < nums[k] ，返回 true ；否则，返回 false 。
+     */
+    public boolean increasingTriplet(int[] nums) {
+        int n = nums.length;
+        if (n < 3) {
+            return false;
+        }
+        int[] leftMin = new int[n];
+        leftMin[0] = nums[0];
+        for (int i = 1; i < n; i++) {
+            leftMin[i] = Math.min(leftMin[i - 1], nums[i]);
+        }
+        int[] rightMax = new int[n];
+        rightMax[n - 1] = nums[n - 1];
+        for (int i = n - 2; i >= 0; i--) {
+            rightMax[i] = Math.max(rightMax[i + 1], nums[i]);
+        }
+        for (int i = 1; i < n - 1; i++) {
+            if (nums[i] > leftMin[i - 1] && nums[i] < rightMax[i + 1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 给定一个二进制数组 nums 和一个整数 k，假设最多可以翻转 k 个 0 ，则返回执行操作后 数组中连续 1 的最大个数 。
+     */
+    public int longestOnes(int[] nums, int k) {
+        int n = nums.length;
+        int left = 0, lsum = 0, rsum = 0;
+        int ans = 0;
+        for (int right = 0; right < n; ++right) {
+            rsum += 1 - nums[right];
+            while (lsum < rsum - k) {
+                lsum += 1 - nums[left];
+                ++left;
+            }
+            ans = Math.max(ans, right - left + 1);
+        }
+        return ans;
+    }
+
+    /**
+     * 无重叠区间
+     * 给定一个区间的集合 intervals ，其中 intervals[i] = [starti, endi] 。返回 需要移除区间的最小数量，使剩余区间互不重叠 。
+     */
+    public int eraseOverlapIntervals(int[][] intervals) {
+        if (intervals.length == 0) {
+            return 0;
+        }
+        // 按照区间的end进行排序
+        Arrays.sort(intervals, Comparator.comparingInt(interval -> interval[1]));
+
+        int n = intervals.length;
+        int right = intervals[0][1];
+        int ans = 1;
+        //统计已经有序的数量
+        for (int i = 1; i < n; ++i) {
+            if (intervals[i][0] >= right) {
+                ++ans;
+                right = intervals[i][1];
+            }
+        }
+        return n - ans;
     }
 }

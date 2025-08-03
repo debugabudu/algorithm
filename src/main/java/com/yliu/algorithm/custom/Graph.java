@@ -294,55 +294,6 @@ public class Graph {
     }
 
     /**
-     * 拓扑排序
-     * 给定一个长度为 n 的整数数组 nums ，其中 nums 是范围为 [1，n] 的整数的排列。
-     * 还提供了一个 2D 整数数组sequences，其中sequences[i]是nums的子序列。
-     * 检查 nums 是否是唯一的最短超序列 。最短 超序列 是 长度最短 的序列，并且所有序列sequences[i]都是它的子序列。
-     * 对于给定的数组sequences，可能存在多个有效的 超序列 。
-     * 例如，对于sequences = [[1,2],[1,3]]，有两个最短的 超序列 ，[1,2,3] 和 [1,3,2] 。
-     * 而对于sequences = [[1,2],[1,3],[1,2,3]]，唯一可能的最短 超序列 是 [1,2,3] 。[1,2,3,4] 是可能的超序列，但不是最短的。
-     * 如果 nums 是序列的唯一最短 超序列 ，则返回 true ，否则返回 false 。
-     * 子序列 是一个可以通过从另一个序列中删除一些元素或不删除任何元素，而不改变其余元素的顺序的序列。
-     */
-    public boolean sequenceReconstruction(int[] nums, int[][] sequences) {
-        int n = nums.length;
-        int[] inDegrees = new int[n + 1];
-        Set<Integer>[] graph = new Set[n + 1];
-        for (int i = 1; i <= n; i++) {
-            graph[i] = new HashSet<>();
-        }
-        for (int[] sequence : sequences) {
-            int size = sequence.length;
-            for (int i = 1; i < size; i++) {
-                int prev = sequence[i - 1], next = sequence[i];
-                if (graph[prev].add(next)) {
-                    inDegrees[next]++;
-                }
-            }
-        }
-        Queue<Integer> queue = new ArrayDeque<>();
-        for (int i = 1; i <= n; i++) {
-            if (inDegrees[i] == 0) {
-                queue.offer(i);
-            }
-        }
-        while (!queue.isEmpty()) {
-            if (queue.size() > 1) {
-                return false;
-            }
-            int num = queue.poll();
-            Set<Integer> set = graph[num];
-            for (int next : set) {
-                inDegrees[next]--;
-                if (inDegrees[next] == 0) {
-                    queue.offer(next);
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
      * 给定一个m x n 二维字符网格board 和一个字符串单词word 。如果word 存在于网格中，返回 true ；否则，返回 false 。
      * 单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。
      * 同一个单元格内的字母不允许被重复使用
@@ -384,5 +335,37 @@ public class Graph {
         }
         visited[i][j] = false;
         return result;
+    }
+
+    /**
+     * 有 n 个城市，其中一些彼此相连，另一些没有相连。
+     * 如果城市 a 与城市 b 直接相连，且城市 b 与城市 c 直接相连，那么城市 a 与城市 c 间接相连。
+     * 省份 是一组直接或间接相连的城市，组内不含其他没有相连的城市。
+     * 给你一个 n x n 的矩阵 isConnected ，其中 isConnected[i][j] = 1 表示第 i 个城市和第 j 个城市直接相连，
+     * 而 isConnected[i][j] = 0 表示二者不直接相连。
+     * 返回矩阵中 省份 的数量。
+     */
+    public int findCircleNum(int[][] isConnected) {
+        int ans = 0;
+        int n = isConnected.length;
+        boolean[] visited = new boolean[n];
+        Queue<Integer> help = new ArrayDeque<>();
+        for(int i=0; i<n; i++){
+            if(!visited[i]){
+                help.offer(i);
+                while(!help.isEmpty()){
+                    int now = help.poll();
+                    visited[now] = true;
+                    int[] tmp = isConnected[now];
+                    for(int j=0; j<tmp.length; j++){
+                        if(!visited[j] && tmp[j] == 1){
+                            help.offer(j);
+                        }
+                    }
+                }
+                ans++;
+            }
+        }
+        return ans;
     }
 }
